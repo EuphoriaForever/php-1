@@ -31,7 +31,7 @@
   <div class="container col-6 mx-auto p-5 my-5 bg-white shadow rounded">
     <button type="button" class="btn btn-success " data-toggle="modal" data-target="#createTable">New Table</button>
     
-    <a class="btn btn-danger" href="database.php?delete_id=<?php echo $_GET['db_id'] ?>">Delete Database</a>
+    <a class="btn btn-danger" href="functions.php?delete_id=<?php echo $_GET['db_id'] ?>">Delete Database</a>
     
     <a class="btn btn-info" href="editDB.php?db_ID=<?php echo $_GET['db_id'] ?>">Edit Database</a>
 
@@ -86,7 +86,7 @@
       <div class="accordion" id="tables">
 
         <!-- okay now let's loop through the tables we've saved in line 63 -->
-        <?php foreach($db['tables'] as $ind=>$tb){ ?>
+        <?php if(isset($db['tables'])) { foreach($db['tables'] as $ind=>$tb){ ?>
           <div class="card">
             <div class="card-header" id="heading-<?php echo $ind; ?>">
               <h2 class="mb-0">
@@ -199,6 +199,8 @@
             </div>
           </div>
           <!-- corresponding attribute modal EOC -->
+        <?php } } else { ?>
+          <h6 class="text-center">There are no tables in this database yet.</h6>
         <?php } ?>
 
       </div>
@@ -245,6 +247,11 @@
 
   <!-- modals EOC -->
 
+
+  <!-- alright here are the php actions -->
+  <?php
+
+  ?>
 
 
    <!-- Optional JavaScript -->
