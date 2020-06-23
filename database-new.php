@@ -29,7 +29,7 @@
 
   <!-- main container BOC -->
   <div class="container col-6 mx-auto p-5 my-5 bg-white shadow rounded">
-    <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal">New Table</button>
+    <button type="button" class="btn btn-success " data-toggle="modal" data-target="#createTable">New Table</button>
     
     <a class="btn btn-danger" href="database.php?delete_id=<?php echo $_GET['db_id'] ?>">Delete Database</a>
     
@@ -66,8 +66,13 @@
               array_push($db['tables'], $table);
 
               # lets check if this table has a PK
-              $checkTablePrimeQuery = "SELECT * attributes WHERE tb_ID = '".$table['tb_ID']."' AND isPrimary = 1";
+              $checkTablePrimeQuery = "SELECT * from attributes WHERE tb_ID = ".$table['tb_ID']." AND isPrimary = 1";
               $checkTablePrimeResult = $conn->query($checkTablePrimeQuery);
+
+              # if it has PK, we add it to our primaries collection
+              if($checkTablePrimeResult->num_rows > 0) {
+                array_push($primaries, $table);
+              }
             }
     
           }
@@ -80,7 +85,7 @@
       <!-- tables accordion BOC -->
       <div class="accordion" id="tables">
 
-      <!-- okay now let's loop through the tables we've saved in line 63 -->
+        <!-- okay now let's loop through the tables we've saved in line 63 -->
         <?php foreach($db['tables'] as $ind=>$tb){ ?>
           <div class="card">
             <div class="card-header" id="heading-<?php echo $ind; ?>">
@@ -154,18 +159,40 @@
                       <div class="form-group col-md-6 col-sm-12">
                         <label class="hidden">Empty</label>
                         <div class="custom-control custom-switch">
-                          <input type="checkbox" name="isFK" value="1" id="fk-<?php echo $ind; ?>" class="custom-control-input">
+                          <input type="checkbox" name="isFK" value="1" id="fk-<?php echo $ind; ?>" class="custom-control-input" index="<?php echo $ind; ?>">
                           <label for="fk-<?php echo $ind; ?>" class="custom-control-label">Foreign Key</label>
                         </div>
                       </div>
 
                       <div class="form-group col-md-6 col-sm-12">
                         <label for="FK_of-<?php echo $ind; ?>">Choose a Table</label>
-                        <select name="FK_of" id="FK_of-<?php echo $ind; ?>" class="form-control">
+                        <select name="FK_of" id="FK_of-<?php echo $ind; ?>" class="form-control" disabled>
                           <option selected value="0" style="display: none">Choose</option>
+                          <!-- loop through our primaries collection and display the tables -->
+                          <?php
+
+                            # count the number of available tables to choose from
+                            $count = 0;
+                            
+                            foreach($primaries as $pkTB) {
+                              if($pkTB['tb_ID'] !== $tb['tb_ID']) {
+                                $count++;
+                                echo '<option value="'.$pkTB['tb_ID'].'">'.$pkTB['tb_Name'].'</option>';
+                              }
+                            }
+                            
+                            if($count === 0) {
+                              echo '<option disabled value="0">No tables available</option>';
+                            }
+                          ?>
                         </select>
                       </div>
                     </div>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" name="submit">Create Attribute</button>
                   </div>
                 </form>
               </div>
@@ -181,6 +208,40 @@
   <!-- main container EOC -->
   
   <!-- modals BOC -->
+  
+    <!-- create new table modal BOC -->
+    <div class="modal fade" id="createTable" tabeindex="-1" role="dialog" aria-labelledby="newTableHeader" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="newTableHeader">Create New Table</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <form action="database.php" method="post" enctype="multipart/form-data">
+            <div class="modal-body">
+              <div class="form-row">
+                <div class="form-group col-12">
+                  <label for="tbName">Table Name</label>
+                  <input type="text" name="tbName" id="tbName" class="form-control" required="required" placeholder="Enter table name">
+                </div>
+              </div>
+
+              <input type="hidden" name="db_id" value="<?php echo $db_id; ?>">
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="submit">Create Table</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- create new table modal EOC -->
 
   <!-- modals EOC -->
 
@@ -189,6 +250,18 @@
    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script>
+      $(document).ready(()=>{
+        $('input[name*="isFK"]').click((e)=>{
+          let code = $(e.target).attr('index');
+          if($(e.target).is(":checked")) {
+            $(`select#FK_of-${code}`).removeAttr("disabled");
+          } else {
+            $(`select#FK_of-${code}`).attr("disabled", "");
+          }
+        })
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
   
