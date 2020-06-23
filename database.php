@@ -286,60 +286,68 @@
         }
 
         if(isset($_POST['submitAttr'])){
-         $attr_Name = $_POST['attr_Name'];
-         $datatype =  $_POST['datatype'];
-         $limitation = $_POST['limitation'];
-         $isPrimary = $_POST['isPrimary'];
-         $isAutoInc = $_POST['isAutoInc'];
-         $isNull = $_POST['isNull'] ; 
-         $isFK =  $_POST['isFK'];
-         $FK_of = $_POST['FK_of'];
-         $tb_ID = $_POST['tb_ID'];
-         $db_ID = $_POST['db_id'];
-         $isOkay = FALSE;
-
-         $sql = "SELECT * FROM attributes WHERE tb_ID = $tb_ID AND isPrimary = 1";
-         $result = $conn->query($sql);
-          #we're checking if there already exists a primary key and if current data we wanna create is also trynna be a primary key
-          #so it there is a PK being returned and it the current attribute we wanna create is also trynna be a PK, we reload the page with the error message echoed
-         if($result->num_rows > 0 && $isPrimary===1){
-          echo "<script language='javascript'>alert('Uh oh This table already has a primary key!');window.location.href='database.php?db_id=$db_ID';</script>";
+          $attr_Name = $_POST['attr_Name'];
+          $datatype =  $_POST['datatype'];
+          $limitation = $_POST['limitation'];
+          $isPrimary = $_POST['isPrimary'];
+          $isAutoInc = $_POST['isAutoInc'];
+          $isNull = $_POST['isNull'] ; 
+          $isFK =  $_POST['isFK'];
+          $FK_of = $_POST['FK_of'];
+ 
+          $tb_ID = $_POST['tb_ID'];
+          $db_ID = $_POST['db_ID'];
+          $isOkay = FALSE;
+         
+          # Here we check for any errors or mishaps
+ 
+ 
+         if($isPrimary==="1"){
+           #we are checking if there already exists a PK
+                 $checkPK = "SELECT * FROM attributes WHERE isPrimary = 1 AND tb_ID = $tb_ID";
+                 $checkQuery = $conn->query($checkPK);
+                 $hasPK = $checkQuery->num_rows;
+ 
+                 if($hasPK >0){
+                     echo "<script language='javascript'>alert('That table already has a primary key!');window.location.href='database.php?db_id=$db_ID';</script>";
+                 }else{
+                   $isOkay = TRUE;
+                 }
          }else{
-           #so is false ang sa if statement, maka create rata aning new attribute
-               
-                  #after creating it, we check if it's an FK
-                  if($isFK ===1){
-                    #if it is an FK, we check if na specify kung sa which table siya nagka FK towards
-                          if($FK_of === 0){
-                            #if this attribute is an FK
-                            echo "<script language='javascript'>alert('Uh oh you did not specify the parent Table of your FK attribute');window.location.href='database.php?db_id=$db_ID';</script>";
-                          }else{
-                            $sql2 = "SELECT * FROM attributes WHERE tb_ID= $FK_of AND isPrimary=1";
-                            $result2 = $conn->query($sql2);
-                            if($result2->num_rows > 0){
-                              $row2 = $result2->fetch_assoc();
-                              $attr_ID = $row2['attr_ID'];
-                              $sql3 = "UPDATE attributes SET isParent = '1' , ParentOf = '$tb_ID' WHERE attr_ID = $attr_ID ";
-                              if($conn->query($sql3)===TRUE){
-                                $isOkay = TRUE;
-                              }
-                            }
-                          }
-                  }else{
-                    $isOkay = TRUE;
-                  }
-
-
-               if($isOkay===TRUE){
-                  $sql4 = "INSERT INTO attributes (attr_ID,attr_Name,datatype,limitation,isPrimary,isAutoInc,isNull,isParent,ParentOf,isFK,FK_of,tb_ID) VALUES ('','$attr_Name','$datatype','$limitation','$isPrimary','$isAutoInc','$isNull','0','0','$isFK','$FK_of','$tb_ID')";
-                  if($conn->query($sql4)===TRUE){
-                    echo "<script language='javascript'>alert('A new Attribute has been created!');window.location.href='database.php?db_id=$db_ID';</script>";
-                  }
-               }
+           
+                 if($isFK === "1"){
+                       if($FK_of === "0"){
+                         echo "<script language='javascript'>alert('You did not specify which table your attribute is an FK of');window.location.href='database.php?db_id=$db_ID';</script>";
+                       }else{
+                             $sql = "SELECT * FROM attributes WHERE isPrimary = 1 and tb_ID = $FK_of ";
+                             $result = $conn->query($sql);
+                             if($result->num_rows>0){
+                               $row = $result->fetch_assoc();
+                               $attr_ID = $row['attr_ID'];
+ 
+                                 $sql2 = "UPDATE attributes SET isParent = '1' , ParentOf = '$tb_ID' WHERE attr_ID = $attr_ID";
+                                 if($conn->query($sql2)===TRUE){
+                                     $isOkay = TRUE;
+                                 }
+                             }
+ 
+                       }
+ 
+                 }else{
+                   $isOkay = TRUE;
+                 }
          }
-
-          
-        }
+ 
+                     #after all of the checking, we see if we're still good to input the new attribute
+ 
+                   if($isOkay === TRUE){
+                     $sql3 = "INSERT INTO attributes (attr_ID,attr_Name,datatype,limitation,isPrimary,isAutoInc,isNull,isParent,ParentOf,isFK,FK_of,tb_ID) VALUES ('','$attr_Name','$datatype','$limitation','$isPrimary','$isAutoInc','$isNull','0','0','$isFK','$FK_of','$tb_ID')";
+                     if($conn->query($sql3)===TRUE){
+                       echo "<script language='javascript'>alert('A new Attribute has been created!');window.location.href='database.php?db_id=$db_ID';</script>";
+                     }
+                   }
+           
+         }
 
         if(isset($_GET['delete_ID'])){
             $db_ID = $_GET['delete_ID'];
