@@ -123,6 +123,8 @@
                     
                           <div id="collapse'.$num.'" class="collapse" aria-labelledby="heading'.$num.'" data-parent="#accordionExample">
                           <div class="card-body">
+                            <a class="btn btn-danger" href="database.php?del_tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Delete Table</a>
+                            <a class="btn btn-info" href="editTB.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Edit Table</a>
                             <a class="btn btn-success" href="database.php?tb_ID='.$row2['tb_ID'].'&db_ID='.$db_id.'">Create a Primary Key (ID)</a>
                             
                             <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal'.$num.'">
@@ -357,6 +359,17 @@
               
               
             }
+        }
+
+        if(isset($_GET['del_tb_ID'])){
+          $tb_ID = $_GET['del_tb_ID'];
+          $db_ID = $_GET['db_id'];
+
+          $sql = "DELETE FROM tb WHERE tb_ID = $tb_ID";
+          if($conn->query($sql)===TRUE){
+            echo "<script language='javascript'>alert('A table has been deleted');window.location.href='database.php?db_id=$db_ID';</script>";
+          }
+
         }
 
         if(isset($_GET['tb_ID'])){
