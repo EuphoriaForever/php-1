@@ -8,3 +8,13 @@ tr:nth-child(odd) td:nth-child(even),
 tr:nth-child(even) td:nth-child(odd) {
   background: black;
 }
+
+label.required::after {
+  color: rgb(218, 36, 36);
+  content: ' *';
+}
+
+label.hidden {
+  color: transparent;
+  user-select: none;
+}
