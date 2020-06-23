@@ -25,7 +25,12 @@ If you cannot find "Git Bash Here", hold `Shift` on your keyboard and right clic
 ```
 4. Before you do any code, **always** run `git pull elle master` to make sure that your code is up to date with all the recent changes.
 
-5. Once you have changes, push your changes *into your own repository* and create a pull request. To do so, head to your forked repo and find the "Pull Request" option.
+5. Once you have changes, there should be an icon on your VSCode Git tab that shows the number of files you've made changes in.
+![Changes in your Git Tab](https://i.imgur.com/AwaCSLl.png)
+
+6. Follow [this quick video](https://i.imgur.com/awwqS90.mp4) to commit and push your changes to your fork. In the little box you see me typing, please specify what changes exactly you have made. Example commit names could be 'fixed create table button', or 'changed UI of login.php page' so we can keep track of the changes we've made.
+
+7. Once you push your changes *into your own repository* and create a pull request. To do so, head to your forked repo and find the "Pull Request" option.
 ![Create a pull request](https://i.imgur.com/gMNCOOW.png)
 If you see that your commits are checked green with "Able to merge", it means that you have no conflicts with the current code. So, simply create the request and add a description.
 ![Able to merge](https://i.imgur.com/tP3dW4u.png)
