@@ -233,7 +233,7 @@
                   
 <?php
  
-    $db_id = $_GET['db_id'] ;
+    $db_id = isset($_GET['db_id']) ? $_GET['db_id'] : $_POST['db_id'];
 
     $conn = new mysqli("localhost","root","","im2");
     if($conn->connect_error){
