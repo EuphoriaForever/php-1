@@ -14,10 +14,24 @@
 
     # always start session
     session_start();
+    include "connectDB.php";
     
+    # add this section here so everything that needs to record the new database in the page (like the navbar and the alert) will be able to catch it
+    if(isset($_POST['submit'])){
+     
+      $db = $_POST['dbName'];
+      $author = $_SESSION['users'][$_SESSION['Succeed']]['id'] ;
+
+      $sql = "INSERT INTO db (db_ID,db_Name,Author) VALUES ('','$db','$author')";
+                         
+      if($conn->query($sql)===TRUE){
+        addAlert("Database created successfully!", "success");
+      }
+    }
+
     # check login creds and connect to DB
     include "checkLogin.php";
-    include "connectDB.php";
+
 
     displayAlert();
   ?>
@@ -33,7 +47,7 @@
                 </p>
             <hr>
             <?php
-            
+
                  if($_SESSION['users'][$_SESSION['Succeed']]['type'] === "administrator"){
                     echo '<p>You issa admin girl</p>';
                 }else {
@@ -82,20 +96,6 @@
         <!--Adding Button and Modal EOC-->
       </div> <!-- jumbotron EOC-->
     </div><!--Container with the width thing EOC-->
-
-<?php
-     if(isset($_POST['submit'])){
-     
-        $db = $_POST['dbName'];
-        $author = $_SESSION['users'][$_SESSION['Succeed']]['id'] ;
-
-        $sql = "INSERT INTO db (db_ID,db_Name,Author) VALUES ('','$db','$author')";
-                           
-        if($conn->query($sql)===TRUE){
-          addAlert("Database created successfully!", "success");
-        }
-     }
-?>
 
   <script src="./scripts/bootstrap.min.js"></script>
      <!-- jQuery first, then Popper.js, then Bootstrap JS -->

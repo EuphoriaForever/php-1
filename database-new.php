@@ -13,9 +13,141 @@
     # start session
     session_start();
 
-    # include login checker
+    # include login checker and connect db
+    include "connectDB.php";
     include "checkLogin.php";
     
+    # will display all alerts at the top
+    displayAlert();
+
+    # get current db info
+    $db_id = $_GET['db_id'];
+    $getDBQuery = "SELECT * FROM db WHERE db_ID = $db_id";
+    $dbResult = $conn->query($getDBQuery);
+    
+    # check if db with that ID exists
+    if($dbResult->num_rows > 0) {
+      $dbRow = $dbResult->fetch_assoc();
+      $db = array('name' => $dbRow['db_Name']);
+
+      # get author of table
+      $authorID = $dbRow['Author'];
+      $getAuthorResult = $conn->query("SELECT * FROM users WHERE user_id = $authorID");
+
+      if($getAuthorResult->num_rows > 0) {
+        $author = $getAuthorResult->fetch_assoc();
+        $db['author'] = $author['username'];
+        $db['authorID'] = $author['user_id'];
+      }
+
+      # get all tables of that database
+      $getTablesQuery = "SELECT * FROM tb WHERE db_ID = $db_id";
+      $tablesResult = $conn->query($getTablesQuery);
+      
+      # check if db has tables
+      if($tablesResult->num_rows > 0) {
+        $db['tables'] = array();
+        $primaries = array(); #this will hold all tables with primary keys
+
+        # lets save the tables in the db object as an array. this way, the embedding of php into html is minimal and it's not labad sa ulo
+        while($table = $tablesResult->fetch_assoc()) {
+          array_push($db['tables'], $table);
+
+          # lets check if this table has a PK
+          $checkTablePrimeQuery = "SELECT * from attributes WHERE tb_ID = ".$table['tb_ID']." AND isPrimary = 1";
+          $checkTablePrimeResult = $conn->query($checkTablePrimeQuery);
+
+          # if it has PK, we add it to our primaries collection
+          if($checkTablePrimeResult->num_rows > 0) {
+            array_push($primaries, $table);
+          }
+        }
+
+      }
+
+      # get permissions for table
+      $permitted = array();
+
+      # add all admins
+      $getAdmins = $conn->query("SELECT * FROM users WHERE type = 'administrator'");
+
+      if($getAdmins->num_rows > 0) {
+
+        # add all admins to permitted array with "All access"
+        while($admin = $getAdmins->fetch_assoc()) {
+          $permitted[$admin['username']] = array("All Access");
+        }
+      }
+
+      # get all database specific permissions
+      $getPermissionsResult = $conn->query("SELECT * FROM permits WHERE db = $db_id");
+      
+      if($getPermissionsResult->num_rows > 0) {
+        while($permittedUser = $getPermissionsResult->fetch_assoc()) {
+          
+          # get the user connected to the permission
+          $userID = $permittedUser['user_ID'];
+
+
+          $findUserResult = $conn->query("SELECT * FROM users WHERE user_ID = $userID");
+
+          if($findUserResult->num_rows > 0) {
+
+            $userRow = $findUserResult->fetch_assoc();
+            $user = $userRow['username'];
+
+            # run through the permit table again to see if a certain user has more than one permission
+            $checkPerms = $conn->query("SELECT * FROM permits WHERE db = $db_id AND user_ID = $userID");
+
+
+            if($checkPerms->num_rows === 4) { # if they have 4 permissions on the database (meaning complete crud), save them under "all access"
+              $permitted[$user] = array("All Access");
+            } else if ($checkPerms->num_rows > 0) {
+
+              # if they don't have complete perms, find these operations one by one
+              while($permission = $checkPerms->fetch_assoc()) {
+                $opID = $permission['operation'];
+                
+                # search for the operation name in operations table
+                $findOp = $conn->query("SELECT * FROM operations WHERE op_ID = $opID");
+
+                if($findOp->num_rows > 0) {
+                  $operation = $findOp->fetch_assoc();
+
+                  # add the operation to the user's array of permissions
+                  if(isset($permitted[$user])) {
+
+                    # if they already have a pre-exsiting array, push into it
+                    array_push($permitted[$user], $operation['operation']);
+                  } else {
+
+                    # if not, create an array for the user
+                    $permitted[$user] = array($operation['operation']);
+                  }
+                }
+
+              }
+            }
+            
+          }
+        }
+      }
+
+      # save all users for future use in adding permissions
+      $allUsers = array();
+
+      $getUsers = $conn->query("SELECT * FROM users WHERE user_id <> ".$db['authorID']." AND `type` <> 'administrator'");
+
+      if($getUsers->num_rows > 0) {
+        while($thisUser = $getUsers->fetch_assoc()) {
+
+          # save the user in the allUsers array as a key-value pair
+          $allUsers[$thisUser['user_id']] = $thisUser['username'];
+        }
+      }
+    } else {
+      header("Location: welcome.php");
+    }
   ?>
 
   <!-- main container BOC -->
@@ -24,61 +156,19 @@
     
     <a class="btn btn-danger" href="deleteDB.php?delete_id=<?php echo $_GET['db_id'] ?>">Delete Database</a>
     
-    <a class="btn btn-info" href="editDB.php?db_ID=<?php echo $_GET['db_id'] ?>">Edit Database</a>
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editDB">Edit Database</button>
+
+    <button class="btn btn-dark" data-toggle="modal" data-target="#permissions">Permissions</button>
 
     <hr>
 
     <div class="container-fluid p-4 bg-light">
-
-      <?php 
-        # connect to DB
-        include "connectDB.php";
-
-        # get current db info
-        $db_id = $_GET['db_id'];
-        $getDBQuery = "SELECT * FROM db WHERE db_ID = $db_id";
-        $dbResult = $conn->query($getDBQuery);
-        
-        # check if db with that ID exists
-        if($dbResult->num_rows > 0) {
-          $dbRow = $dbResult->fetch_assoc();
-          $db = array('name' => $dbRow['db_Name']);
-
-          # get all tables of that database
-          $getTablesQuery = "SELECT * FROM tb WHERE db_ID = $db_id";
-          $tablesResult = $conn->query($getTablesQuery);
-          
-          # check if db has tables
-          if($tablesResult->num_rows > 0) {
-            $db['tables'] = array();
-            $primaries = array(); #this will hold all tables with primary keys
-
-            # lets save the tables in the db object as an array. this way, the embedding of php into html is minimal and it's not labad sa ulo
-            while($table = $tablesResult->fetch_assoc()) {
-              array_push($db['tables'], $table);
-
-              # lets check if this table has a PK
-              $checkTablePrimeQuery = "SELECT * from attributes WHERE tb_ID = ".$table['tb_ID']." AND isPrimary = 1";
-              $checkTablePrimeResult = $conn->query($checkTablePrimeQuery);
-
-              # if it has PK, we add it to our primaries collection
-              if($checkTablePrimeResult->num_rows > 0) {
-                array_push($primaries, $table);
-              }
-            }
-    
-          }
-        } else {
-          header("Location: welcome.php");
-        }
-      ?>
-
       <h4 class="text-info">Database: <?php echo $db['name']; ?></h4>
       <hr>
       <h5 class="text-info text-center">Tables</h5>
       
       <!-- tables accordion BOC -->
-      <div class="accordion" id="tables">
+      <div class="accordion border-bottom rounded" id="tables">
 
         <!-- okay now let's loop through the tables we've saved in line 63 -->
         <?php if(isset($db['tables'])) { foreach($db['tables'] as $ind=>$tb){ ?>
@@ -95,6 +185,9 @@
 
                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createAttr-<?php echo $ind; ?>">Create Attribute</button>
 
+                <a href="editTB.php?id=<?php echo $tb['tb_ID']; ?>" class="btn btn-info">Edit Table</a>
+
+                <a href="deleteTable.php?id=<?php echo $tb['tb_ID']; ?>" class="btn btn-danger">Delete Table</a>
               </div>
             </div>
           </div>
@@ -212,8 +305,8 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="newTableHeader">Create New Table</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -239,6 +332,105 @@
       </div>
     </div>
     <!-- create new table modal EOC -->
+
+    <!-- edit database modal BOC -->
+    <div class="modal fade" id="editDB" role="dialog" tabindex="-1" aria-labelledby="editTBHeader" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editTBHeader">Edit Database</h5>
+            
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <form action="editDB-new.php" method="post">
+            <div class="modal-body">
+              <div class="form-row">
+                <div class="form-group col-12">
+                  <label for="rename">Rename Database</label>
+                  <input type="text" name="rename" id="rename" class="form-control" required="required" placeholder="Enter new database name">
+                </div>
+              </div>
+
+              <input type="hidden" name="db_id" value="<?php echo $db_id; ?>">
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="submit">Edit Database</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- edit database modal EOC -->
+
+    <!-- permissions list modal BOC -->
+    <div class="modal fade" id="permissions" role="dialog" tabindex="-1" aria-labelledby="permissionsHeader" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="permissionsHeader">User Permissions</h5>
+
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+          <!-- if you can found the author before, print it -->
+            <?php if(isset($db['author'])) { ?>
+              <p>
+                <b>Author:</b> <?php echo $db['author']; ?>
+              </p>
+            <?php } ?>
+
+            <!-- if no extra permissions, say so. If there are, print it. -->
+            <?php if(empty($permitted)) { ?>
+              <h5 class="text-center font-weight-bold">There are no extra permissions for this table.</h5>
+            <?php } else { ?>
+              <table class="table table-striped">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Operation</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                <!-- go through the list of permitted users -->
+                  <?php foreach($permitted as $user => $userPerms) {?>
+                    <td><?php echo $user; ?></td>
+                    <td>
+                      <?php 
+
+                        # go through their permissions array
+                        foreach($userPerms as $ind => $perm) {
+                          $str = "";
+
+                          if($ind > 0) {
+
+                            # add a comma if the permission is not first on the list
+                            $str .= ", ";
+                          }
+
+                          $str .= $perm;
+
+                          echo $str;
+                        }
+                      ?>
+                    </td>
+                  <?php } ?>
+                </tbody>
+              </table>
+            <?php } ?>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- permissions list modal EOC -->
 
   <!-- modals EOC -->
 
