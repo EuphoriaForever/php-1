@@ -33,7 +33,7 @@
 
     
   ?>
-          <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow rounded">
+          <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
 <?php
 
 
@@ -64,19 +64,17 @@
 
                     echo'
                       <form action="editDB.php" method="POST" enctype="multipart/form-data">
-                        <div class="form-row">
-                            <div class="form-group col-12">
-                                <label for="fname">First Name</label>
-                                <input type="text" class="form-control" name="db_Name" value="'.$row['db_Name'].'" placeholder="Enter database name" required>
-                                <input type="hidden"  class="form-control" name="db_ID" value="'.$db_ID.'" id="db_ID"  required>
-                                </div>
-                        </div>
-      
-                        <div class="row justify-content-end mx-1">
-                          <a href="javascript:history.go(-1)" type="button" class="btn btn-secondary mx-2">Cancel</a>
-                          <button type="submit" class="btn btn-success" name="submit">Submit</button>
-                        </div>
-                      </form>
+                      <div class="form-row">
+                           <div class="form-group col-md-6">
+                               <label for="fname">First Name</label>
+                               <input type="text" class="form-control" name="db_Name" value="'.$row['db_Name'].'" placeholder="Enter database name" required>
+                               <input type="hidden"  class="form-control" name="db_ID" value="'.$db_ID.'" id="db_ID"  required>
+                               </div>
+                       </div>
+    
+                      <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
+                      <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
+                    </form>
                        ';  
                          
                          
@@ -88,13 +86,59 @@
                 $db_Name = $_POST['db_Name'];
                 $db_ID = $_POST['db_ID'];
 
-              
+                $isOkay = checkPermit('3',$db_ID,$conn);
+
+                if($isOkay==TRUE){  
                   $sql = "UPDATE db SET db_Name = '$db_Name' WHERE db_ID = $db_ID ";
                   if($conn->query($sql)===TRUE){
                     echo "<script language='javascript'>alert('Information Successfully Edited!');window.location.href='database.php?db_id=$db_ID';</script>";
                     }
+                  }else{
+                    echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$db_ID';</script>";
+                  }
                 
             }
+
+
+            function checkPermit($operation,$db_ID,$conn){
+              $isOkay = FALSE;
+
+              if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
+                  $isOkay = TRUE;
+              }else{
+
+                  $username = $_SESSION['Succeed'];
+                  $sql = "SELECT * FROM users WHERE username ='$username'";
+                 
+                  $result = $conn->query($sql);
+                  if($result->num_rows>0){
+                    $row = $result->fetch_assoc();
+                    $userID = $row['user_id'];
+
+                    $sql2 = "SELECT * FROM db where db_ID = $db_ID";
+                    $result2 = $conn->query($sql2);
+
+                          if($result2->num_rows>0){
+                                  $row2 = $result2->fetch_assoc();
+                                  $AuthorID = $row2['Author'];
+
+                                    if($userID == $AuthorID){
+                                          $isOkay = TRUE;
+                                    }else{
+                                           $sql3 = "SELECT * FROM permits WHERE operation=$operation AND user_ID = $userID AND db = $db_ID";
+                                           $result3 = $conn->query($sql3);
+                                                if($result3->num_rows>0){
+                                                    $isOkay = TRUE;
+                                                 }
+                                    }
+
+                          }
+                   }
+              }
+
+          return $isOkay;
+
+    }
 
 
 ?>
