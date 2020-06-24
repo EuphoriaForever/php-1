@@ -1,13 +1,16 @@
 <html>
+
 <head>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="./styles/bootstrap.min.css">
-    <title>Database</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles/bootstrap.min.css">
+  <title>Database</title>
 </head>
+
 <body class="bg-secondary">
-     
-    <?php
+
+  <?php
   // include "./includes/navbar.php";
 
     session_start(); #start session in each form validation page so that we can all access the super global var $_SESSION
@@ -33,68 +36,77 @@
 
     
   ?>
-             <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
-                    <!--Adding Table BOC-->
-                    <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal">
-                         New Table
-                     </button>
-                     <a class="btn btn-danger" href="database.php?delete_ID=<?php echo $_GET['db_id'] ?>">Delete Database</a>
-                     <a class="btn btn-info" href="editDB.php?db_ID=<?php echo $_GET['db_id'] ?>">Edit Database</a>
-                    <!-- Modal -->
-                    <div class="modal fade text-dark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">What's in a name...</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div><!--modal header EOC-->
-                                     <!--Content within the modal modal-content BOC-->
-                                        <form action="database.php" method="POST" enctype="multipart/form-data">
-                                            <div class="form-row">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="tbName">Table Name</label>
-                                                        <input type="text" class="form-control" name="tbName" placeholder="Enter table name" required>
-                                                   </div>
-                                            </div><!--form row EOC-->
+  <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
+    <!--Adding Table BOC-->
+    <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal">
+      New Table
+    </button>
+    <a class="btn btn-danger" href="database.php?delete_ID=<?php echo $_GET['db_id'] ?>">Delete Database</a>
+    <a class="btn btn-info" href="editDB.php?db_ID=<?php echo $_GET['db_id'] ?>">Edit Database</a>
+    <!-- Modal -->
+    <div class="modal fade text-dark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">What's in a name...</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <!--modal header EOC-->
+          <!--Content within the modal modal-content BOC-->
+          <form action="database.php" method="POST" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="tbName">Table Name</label>
+                <input type="text" class="form-control" name="tbName" placeholder="Enter table name" required>
+              </div>
+            </div>
+            <!--form row EOC-->
 
-                                            <input type="hidden" class="form-control" name="db_id" value="<?php echo $_GET['db_id']?>" required>
-                                            
-                                                <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
-                                                <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
-                                        </form><!--EOC form-->
-                                     </div><!-- modal-content EOC-->
-                             </div><!--Modal-dialog EOC-->
-                     </div><!--MODAL EOC-->
-                     <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                            Permit List
-                     </button>
-                            
-                      <div class="collapse" id="collapseExample">
-                      
-                          <div class="card card-body">
-                              <!--The adding of new permits-->
-                              <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModaliver">
-                                  New Permit
-                              </button>
-                              <br>
-                              <h5 class="text-info text-center">Users Permitted On This Database </h5>
-                    
-                              <!-- Modal -->
-                            <div class="modal fade text-dark" id="exampleModaliver" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                         <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Who do you want to be able to CRUD here</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                 </div><!--modal header EOC-->
-                                                  <!--Content within the modal modal-content BOC-->
-                                                   <form action="database.php" method="POST" enctype="multipart/form-data">
-                                                   <!--Dynamic Permit List and Dynamic Modal for Permit-->
-                                      <?php
+            <input type="hidden" class="form-control" name="db_id" value="<?php echo $_GET['db_id']?>" required>
+
+            <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
+            <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
+          </form>
+          <!--EOC form-->
+        </div><!-- modal-content EOC-->
+      </div>
+      <!--Modal-dialog EOC-->
+    </div>
+    <!--MODAL EOC-->
+    <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample"
+      aria-expanded="false" aria-controls="collapseExample">
+      Permit List
+    </button>
+
+    <div class="collapse" id="collapseExample">
+
+      <div class="card card-body">
+        <!--The adding of new permits-->
+        <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModaliver">
+          New Permit
+        </button>
+        <br>
+        <h5 class="text-info text-center">Users Permitted On This Database </h5>
+
+        <!-- Modal -->
+        <div class="modal fade text-dark" id="exampleModaliver" tabindex="-1" role="dialog"
+          aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Who do you want to be able to CRUD here</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <!--modal header EOC-->
+              <!--Content within the modal modal-content BOC-->
+              <form action="database.php" method="POST" enctype="multipart/form-data">
+                <!--Dynamic Permit List and Dynamic Modal for Permit-->
+                <?php
                                          $db_id = $_GET['db_id'];
 
                                          $conn = new mysqli("localhost","root","","im2");
@@ -224,21 +236,17 @@
                                               
 
                                            //We will also try to include other users who aren't the author/admin but are given access, assuming there are any.
-                                           mysqli_close($conn); 
                                            ?>
-                                      </tbody>
-                                  </table>
-                          </div><!--CARD BODY EOC-->
-                      </div><!--COLLAPSE EOC-->
-                  
-<?php
+                </tbody>
+                </table>
+            </div>
+            <!--CARD BODY EOC-->
+          </div>
+          <!--COLLAPSE EOC-->
+
+          <?php
  
     $db_id = isset($_GET['db_id']) ? $_GET['db_id'] : $_POST['db_id'];
-
-    $conn = new mysqli("localhost","root","","im2");
-    if($conn->connect_error){
-     die("Connection failed: " . $conn->connect_error);
-    }
 
     $sql = "SELECT * FROM db WHERE db_ID = $db_id";
     $result = $conn->query($sql);
@@ -418,18 +426,14 @@
                   </div>
                 </div> ';      
     }
-    mysqli_close($conn); 
    ?>
-                </div><!--jumbotron EOC-->
-            </div><!--Container EOC-->
-           
+        </div>
+        <!--jumbotron EOC-->
+      </div>
+      <!--Container EOC-->
 
- <?php
-  $conn = new mysqli("localhost","root","","im2");
-  if($conn->connect_error){
-   die("Connection failed: " . $conn->connect_error);
-  }
 
+      <?php
         if(isset($_POST['submit'])){
             $dbID = $_POST['db_id'];
             $tb_Name = $_POST['tbName'];
@@ -562,6 +566,8 @@
 
 
           function checkPermit($operation,$db_ID){
+              include "connectDB.php";
+              
                     $isOkay = FALSE;
 
                     if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
@@ -607,17 +613,24 @@
 
 ?>
 
-<!--HELLO I AM BIG FEAR!!!!! this is where I got stuck!-->
+      <!--HELLO I AM BIG FEAR!!!!! this is where I got stuck!-->
 
 
 
 
 
-   <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  
+      <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+      </script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+      </script>
+
 </body>
+
 </html>
