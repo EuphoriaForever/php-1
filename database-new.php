@@ -13,31 +13,23 @@
     # start session
     session_start();
 
-    # check current login session. if null, ask to login
-    if(!isset($_SESSION['Succeed'])) {
-      header("Location: login.php");
-    }
-
-    # add navbar
-    include "./includes/navbarMain.php";
-
-    # logout from session
-    if(isset($_GET['logout'])){
-      unset($_SESSION['Succeed']);
-    }
+    # include login checker
+    include "checkLogin.php";
+    
   ?>
 
   <!-- main container BOC -->
   <div class="container col-6 mx-auto p-5 my-5 bg-white shadow rounded">
     <button type="button" class="btn btn-success " data-toggle="modal" data-target="#createTable">New Table</button>
     
-    <a class="btn btn-danger" href="functions.php?delete_id=<?php echo $_GET['db_id'] ?>">Delete Database</a>
+    <a class="btn btn-danger" href="deleteDB.php?delete_id=<?php echo $_GET['db_id'] ?>">Delete Database</a>
     
     <a class="btn btn-info" href="editDB.php?db_ID=<?php echo $_GET['db_id'] ?>">Edit Database</a>
 
     <hr>
 
     <div class="container-fluid p-4 bg-light">
+
       <?php 
         # connect to DB
         include "connectDB.php";
@@ -76,8 +68,11 @@
             }
     
           }
+        } else {
+          header("Location: welcome.php");
         }
       ?>
+
       <h4 class="text-info">Database: <?php echo $db['name']; ?></h4>
       <hr>
       <h5 class="text-info text-center">Tables</h5>
@@ -246,13 +241,6 @@
     <!-- create new table modal EOC -->
 
   <!-- modals EOC -->
-
-
-  <!-- alright here are the php actions -->
-  <?php
-
-  ?>
-
 
    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

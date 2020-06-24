@@ -30,6 +30,7 @@
     }
 
     $conn->query("DELETE FROM db WHERE db_ID = ".$deleteDB);
+    addAlert("Successfully deleted database!", "success");
     header("Location: welcome.php");
   }
 ?>
