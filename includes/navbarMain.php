@@ -31,10 +31,8 @@
                     echo '<li class="nav-item"><a class="nav-link" >No databases yet</a></li>';
                 }   
     ?>
-            <li class="nav-item">
-           <a href="?logout=true" class="nav-link text-light">Logout</a>
-        </li>
- 
+
     </ul>
+    <a href="?logout=true" class="nav-link text-danger ml-auto">Logout</a>
   </div>
 </nav>
