@@ -214,7 +214,7 @@
                                                           <tr>
                                                                   <td>'.$username.'</td>
                                                                   <td>'.$operation.'</td>
-                                                                  <td></td>
+                                                                  <td><td><a class="btn btn-danger" href="database.php?delete_Permit='.$permit_ID.'&db_id='.$db_id.'">Delete Permit</a></td></td>
                                                           </tr>
                                                        ';   
 
@@ -233,7 +233,7 @@
                   
 <?php
  
-    $db_id = isset($_GET['db_id']) ? $_GET['db_id'] : $_POST['db_id'];
+    $db_id = $_GET['db_id'] ;
 
     $conn = new mysqli("localhost","root","","im2");
     if($conn->connect_error){
@@ -584,6 +584,41 @@
         }else{
               echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$dbID';</script>";
         }
+    }
+
+    if(isset($_POST['submitPermit'])){
+        $user = $_POST['user'];
+        $operation = $_POST['operation'];
+        $db_id = $_POST['db_id'];
+
+        $isOkay = checkPermit('1',$db_id,$conn);
+
+        if($isOkay == TRUE){
+              $sql = "INSERT INTO permits (permit_ID,operation,user_ID,db) VALUES ('','$operation','$user','$db_id')";
+              if($conn->query($sql)===TRUE){
+                echo "<script language='javascript'>alert('Permit Successfully Added!');window.location.href='database.php?db_id=$db_id';</script>";
+              }
+              
+        }else{
+              echo "<script language='javascript'>alert('Uh oh! You do not have a permit to assign users to this DB');window.location.href='database.php?db_id=$db_id';</script>";
+        }
+
+    }
+
+    if(isset($_GET['delete_Permit'])){
+      $permit_ID = $_GET['delete_Permit'];
+      $db_ID = $_GET['db_id'];
+
+      $isOkay = checkPermit('4',$db_ID,$conn);
+
+      if($isOkay==TRUE){ 
+        $sql = "DELETE FROM permits WHERE permit_ID = $permit_ID";
+              if($conn->query($sql)===TRUE){
+                       echo "<script language='javascript'>alert('A permit has been deleted');window.location.href='database.php?db_id=$db_ID';</script>";
+              }
+      }else{
+        echo "<script language='javascript'>alert('Uh oh! You are not authorized to delete from permit list');window.location.href='database.php?db_id=$db_ID';</script>";
+      }
     }
 
 
