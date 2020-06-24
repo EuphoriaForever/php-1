@@ -290,8 +290,54 @@
                             <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal'.$num.'">
                                  Create an Attribute
                              </button>
-                           
-                            
+                             ';
+                              /// PHP CODE TO DISPLAY THE TABLE HERE
+                              $sql = "SELECT * FROM attributes WHERE tb_ID=".$row2['tb_ID'];
+                              $attributeList = $conn->query($sql);
+                              if($attributeList != null && $attributeList->num_rows > 0){
+                                // populating ATTRIBUTE ARRAY
+                                $attributeArray = array();
+                                while($attribute = $attributeList->fetch_assoc()){
+                                  if($attribute['isPrimary'] == 1){ // if primary key move to the front of the array
+                                    array_unshift($attributeArray, $attribute);
+                                  } else {
+                                    $attributeArray[] = $attribute;
+                                  }
+                                }
+                                // bell of displaying values ding ding ding
+                                $sql = "SELECT * FROM `rows` WHERE `rowNum`=1 AND `attr_ID`=".$attributeArray[0]['attr_ID'];
+                                $check = $conn->query($sql); 
+                                // Checks if the primary key's first row has a value, if it doesn't it means the table is empty
+                                if($check!=null && $check->num_rows>0){
+                                  echo "<table class='table'><thead><tr>";
+                                  for($ctr=0; $ctr<count($attributeArray); $ctr++){
+                                    echo "<th>".$attributeArray[$ctr]['attr_Name']."</th>";
+                                  }
+                                  echo "</tr></thead>";
+                                  $rowNum=1;
+                                  do{
+                                    echo "<tr>";
+                                    for($ctr=0; $ctr<count($attributeArray); $ctr++){
+                                      $sql = "SELECT * FROM `rows` WHERE `rowNum`=1 AND `attr_ID`=".$attributeArray[$ctr]['attr_ID'];
+                                      $cell = $conn->query($sql);
+                                      $value = $cell->fetch_assoc();
+                                      echo "<td>".$value['value']."</td>";
+                                    }
+                                    echo "</tr>";
+                                    // check if the next row num exists
+                                    $rowNum++;
+                                    $sql = "SELECT value FROM `rows` WHERE `rowNum`=$rowNum AND `attr_ID`=".$attributeArray[0]['attr_ID'];
+                                    $check = $conn->query($sql);
+                                  }while($check!=null && $check->num_rows>0);
+                                  echo "</table>";
+                                } else {
+                                  // table is empty
+                                }
+                              } else {
+                                // attribute list is empty
+                              }
+                              // END OF KP CODE
+                              echo '
                             <div class="modal fade text-dark" id="exampleModal'.$num.'" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                             <div class="modal-content">
@@ -301,7 +347,6 @@
                                                         <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
-                                             
                                                 <form action="database.php" method="POST" enctype="multipart/form-data">
                                                     <div class="form-row">
                                                             <div class="form-group col-md-5">
