@@ -226,7 +226,7 @@
                                                           <tr>
                                                                   <td>'.$username.'</td>
                                                                   <td>'.$operation.'</td>
-                                                                  <td></td>
+                                                                  <td><td><a class="btn btn-danger" href="database.php?delete_Permit='.$permit_ID.'&db_id='.$db_id.'">Delete Permit</a></td></td>
                                                           </tr>
                                                        ';   
 
@@ -246,7 +246,7 @@
 
           <?php
  
-    $db_id = isset($_GET['db_id']) ? $_GET['db_id'] : $_POST['db_id'];
+    $db_id = $_GET['db_id'] ;
 
     $sql = "SELECT * FROM db WHERE db_ID = $db_id";
     $result = $conn->query($sql);
@@ -432,15 +432,21 @@
       </div>
       <!--Container EOC-->
 
+ <?php
+ 
+  $conn = new mysqli("localhost","root","","im2");
+  if($conn->connect_error){
+   die("Connection failed: " . $conn->connect_error);
+  }
 
       <?php
         if(isset($_POST['submit'])){
             $dbID = $_POST['db_id'];
             $tb_Name = $_POST['tbName'];
 
-            $isOkay = checkPermit(1,$dbID);
+            $isOkay = checkPermit('1',$dbID,$conn);
 
-            if($isOkay===TRUE){
+            if($isOkay==TRUE){
                   $sql = "INSERT INTO tb (tb_ID,tb_Name,db_ID) VALUES ('','$tb_Name','$dbID')";
                   if($conn->query($sql)===TRUE){   
                         //Supposedly after inserting into tb, mureload ang kani na page parin with the $_GET['db_id'] parin pero it won't be passed as well for some reason
@@ -468,42 +474,44 @@
         
          # Here we check for any errors or mishaps
 
+         $isOkay = checkPermit('1',$db_ID,$conn);
 
-        if($isPrimary=="1"){
-          #we are checking if there already exists a PK
-                $checkPK = "SELECT * FROM attributes WHERE isPrimary = 1 AND tb_ID = $tb_ID";
-                $checkQuery = $conn->query($checkPK);
-                $hasPK = $checkQuery->num_rows;
+         if($isOkay==TRUE){
+                if($isPrimary=="1"){
+                            #we are checking if there already exists a PK
+                            $checkPK = "SELECT * FROM attributes WHERE isPrimary = 1 AND tb_ID = $tb_ID";
+                            $checkQuery = $conn->query($checkPK);
+                            $hasPK = $checkQuery->num_rows;
 
-                if($hasPK >0){
-                    echo "<script language='javascript'>alert('That table already has a primary key!');window.location.href='database.php?db_id=$db_ID';</script>";
-                }else{
-                  $isOkay = TRUE;
-                }
-        }else{
-          
-                if($isFK === "1"){
-                      if($FK_of === "0"){
-                        echo "<script language='javascript'>alert('You did not specify which table your attribute is an FK of');window.location.href='database.php?db_id=$db_ID';</script>";
-                      }else{
-                            $sql = "SELECT * FROM attributes WHERE isPrimary = 1 and tb_ID = $FK_of ";
-                            $result = $conn->query($sql);
-                            if($result->num_rows>0){
-                              $row = $result->fetch_assoc();
-                              $attr_ID = $row['attr_ID'];
-
-                                $sql2 = "UPDATE attributes SET isParent = '1' , ParentOf = '$tb_ID' WHERE attr_ID = $attr_ID";
-                                if($conn->query($sql2)===TRUE){
-                                    $isOkay = TRUE;
-                                }
+                            if($hasPK >0){
+                                   echo "<script language='javascript'>alert('That table already has a primary key!');window.location.href='database.php?db_id=$db_ID';</script>";
+                            }else{
+                                   $isOkay = TRUE;
                             }
+               }else{
+          
+                      if($isFK === "1"){
+                            if($FK_of === "0"){
+                                     echo "<script language='javascript'>alert('You did not specify which table your attribute is an FK of');window.location.href='database.php?db_id=$db_ID';</script>";
+                             }else{
+                                     $sql = "SELECT * FROM attributes WHERE isPrimary = 1 and tb_ID = $FK_of ";
+                                     $result = $conn->query($sql);
+                                      if($result->num_rows>0){
+                                          $row = $result->fetch_assoc();
+                                          $attr_ID = $row['attr_ID'];
 
+                                          $sql2 = "UPDATE attributes SET isParent = '1' , ParentOf = '$tb_ID' WHERE attr_ID = $attr_ID";
+                                              if($conn->query($sql2)===TRUE){
+                                                $isOkay = TRUE;
+                                              }
+                                       }
+
+                              }
+
+                      }else{
+                        $isOkay = TRUE;
                       }
-
-                }else{
-                  $isOkay = TRUE;
                 }
-        }
 
                     #after all of the checking, we see if we're still good to input the new attribute
 
@@ -513,33 +521,53 @@
                       echo "<script language='javascript'>alert('A new Attribute has been created!');window.location.href='database.php?db_id=$db_ID';</script>";
                     }
                   }
+
+           }else{
+                 echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this DB');window.location.href='database.php?db_id=$db_ID';</script>";
+            }
+
           
         }
 
         if(isset($_GET['delete_ID'])){
             $db_ID = $_GET['delete_ID'];
+
+        $isOkay = checkPermit('4',$db_ID,$conn);
+
+        if($isOkay==TRUE){   
             $sql = "DELETE FROM db WHERE db_ID= $db_ID";
             if($conn->query($sql)===TRUE){
                 echo "<script language='javascript'>alert('Database Successfully Deleted!');window.location.href='welcome.php';</script>";
-              
-              
+ 
             }
+          }else{
+            echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this DB');window.location.href='database.php?db_id=$db_ID';</script>";
+          }
         }
 
         if(isset($_GET['del_tb_ID'])){
           $tb_ID = $_GET['del_tb_ID'];
           $db_ID = $_GET['db_id'];
 
-          $sql = "DELETE FROM tb WHERE tb_ID = $tb_ID";
-          if($conn->query($sql)===TRUE){
-            echo "<script language='javascript'>alert('A table has been deleted');window.location.href='database.php?db_id=$db_ID';</script>";
-          }
+          $isOkay = checkPermit('4',$db_ID,$conn);
 
+          if($isOkay==TRUE){       
+                $sql = "DELETE FROM tb WHERE tb_ID = $tb_ID";
+                if($conn->query($sql)===TRUE){
+                      echo "<script language='javascript'>alert('A table has been deleted');window.location.href='database.php?db_id=$db_ID';</script>";
+                }
+          }else{
+               echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$db_ID';</script>";
+            }
         }
 
-        if(isset($_GET['tb_ID'])){
+    if(isset($_GET['tb_ID'])){
           $tb_ID = $_GET['tb_ID'];
           $dbID = $_GET['db_id'];
+
+      $isOkay = checkPermit('1',$dbID,$conn);
+
+      if($isOkay==TRUE){  
             $checkPK = "SELECT * FROM attributes WHERE isPrimary = 1 AND tb_ID = $tb_ID";
             $checkQuery = $conn->query($checkPK);
             $hasPK = $checkQuery->num_rows;
@@ -562,12 +590,48 @@
              
                  }
              }
-          }
+        }else{
+              echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$dbID';</script>";
+        }
+    }
 
+    if(isset($_POST['submitPermit'])){
+        $user = $_POST['user'];
+        $operation = $_POST['operation'];
+        $db_id = $_POST['db_id'];
 
-          function checkPermit($operation,$db_ID){
-              include "connectDB.php";
+        $isOkay = checkPermit('1',$db_id,$conn);
+
+        if($isOkay == TRUE){
+              $sql = "INSERT INTO permits (permit_ID,operation,user_ID,db) VALUES ('','$operation','$user','$db_id')";
+              if($conn->query($sql)===TRUE){
+                echo "<script language='javascript'>alert('Permit Successfully Added!');window.location.href='database.php?db_id=$db_id';</script>";
+              }
               
+        }else{
+              echo "<script language='javascript'>alert('Uh oh! You do not have a permit to assign users to this DB');window.location.href='database.php?db_id=$db_id';</script>";
+        }
+
+    }
+
+    if(isset($_GET['delete_Permit'])){
+      $permit_ID = $_GET['delete_Permit'];
+      $db_ID = $_GET['db_id'];
+
+      $isOkay = checkPermit('4',$db_ID,$conn);
+
+      if($isOkay==TRUE){ 
+        $sql = "DELETE FROM permits WHERE permit_ID = $permit_ID";
+              if($conn->query($sql)===TRUE){
+                       echo "<script language='javascript'>alert('A permit has been deleted');window.location.href='database.php?db_id=$db_ID';</script>";
+              }
+      }else{
+        echo "<script language='javascript'>alert('Uh oh! You are not authorized to delete from permit list');window.location.href='database.php?db_id=$db_ID';</script>";
+      }
+    }
+
+
+          function checkPermit($operation,$db_ID,$conn){
                     $isOkay = FALSE;
 
                     if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
