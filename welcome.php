@@ -11,33 +11,18 @@
 <body class="bg-secondary">
 
   <?php
-  // include "./includes/navbar.php";
 
-    session_start(); #start session in each form validation page so that we can all access the super global var $_SESSION
-
+    # always start session
+    session_start();
     
-    if(!isset($_SESSION['Succeed'])) { #if there is no current login session detected, go to login page
-      header("Location: login.php");
-    }else{
+    # check login creds and connect to DB
+    include "checkLogin.php";
+    include "connectDB.php";
 
-    //   if($_SESSION['users'][$_SESSION['Succeed']]['type'] ==="administrator"){
-    //     include "./includes/navbarAdmin.php";
-    //   }else {
-    //     include "./includes/navbarUser.php";
-    //   }
-        include "./includes/navbarMain.php";
-
-    }
-
-    if(isset($_GET['logout'])) { #if u wanna logout, remove current login session and redirect to login page
-      unset($_SESSION['Succeed']);
-      header("Location: login.php");
-    }
-
-    
+    displayAlert();
   ?>
 
-    <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
+    <div class="container w-50 mx-auto p-5 my-5 bg-white shadow rounded">
         <div class="jumbotron jumbotron-fluid ">
         <div class="container">
              <!-- welcome the user by their saved first name -->
@@ -48,7 +33,7 @@
                 </p>
             <hr>
             <?php
-
+            
                  if($_SESSION['users'][$_SESSION['Succeed']]['type'] === "administrator"){
                     echo '<p>You issa admin girl</p>';
                 }else {
@@ -104,14 +89,10 @@
         $db = $_POST['dbName'];
         $author = $_SESSION['users'][$_SESSION['Succeed']]['id'] ;
 
-        $conn = new mysqli("localhost","root","","im2");
-        if($conn->connect_error){
-            die("Connection failed: " . $conn->connect_error);
-        }
         $sql = "INSERT INTO db (db_ID,db_Name,Author) VALUES ('','$db','$author')";
                            
         if($conn->query($sql)===TRUE){
-            echo "<script language='javascript'>alert('Database Successfully Added!');window.location.href='welcome.php?';</script>";
+          addAlert("Database created successfully!", "success");
         }
      }
 ?>
