@@ -439,7 +439,6 @@
    die("Connection failed: " . $conn->connect_error);
   }
 
-      <?php
         if(isset($_POST['submit'])){
             $dbID = $_POST['db_id'];
             $tb_Name = $_POST['tbName'];
