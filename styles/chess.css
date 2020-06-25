@@ -30,3 +30,28 @@ label.hidden {
 #login .invalid-feedback {
   display: block;
 }
+
+.dropdown-toggle[id*="tableSettings"]::after {
+  display: none;
+}
+
+.accordion>.card {
+  overflow: visible;
+}
+
+[id*="tableSettings"]~.dropdown-menu {
+  padding: 0px;
+}
+
+[id*="tableSettings"]~.dropdown-menu .dropdown-item {
+  padding: .5rem 1.5rem;
+}
+
+[id*="tableSettings"]~.dropdown-menu .dropdown-item:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+[id*="tableSettings"]~.dropdown-menu .dropdown-item.alert-danger:hover {
+  background-color: var(--danger);
+}
