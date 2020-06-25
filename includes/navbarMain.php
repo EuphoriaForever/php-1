@@ -33,6 +33,9 @@
     ?>
 
     </ul>
-    <a href="?logout=true" class="nav-link text-danger ml-auto">Logout</a>
+    <span class="navbar-text">
+      <b>Signed in as:</b> <?php echo $_SESSION['Succeed']['username']; ?>
+      <a href="?logout=true" class="text-danger ml-5">Logout</a>
+    </span>
   </div>
 </nav>
