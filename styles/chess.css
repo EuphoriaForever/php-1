@@ -18,3 +18,11 @@ label.hidden {
   color: transparent;
   user-select: none;
 }
+
+.modal.fade {
+  transition: all 200ms ease-in-out;
+}
+
+.modal.fade.show {
+  background: rgba(0,0,0,.5);
+}
