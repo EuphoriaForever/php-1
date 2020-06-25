@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="./styles/bootstrap.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <link rel="stylesheet" href="./styles/chess.css">
-  <title>Register</title>
+  <title>Login</title>
 </head>
 <body class="bg-secondary">
   <?php
@@ -26,26 +26,39 @@
       return in_array($err, $_SESSION['loginErr']);
     }
 
+    # check if you hit the login button
     if(isset($_POST['login'])) {
+
+      # save inputs
       $username = $_POST['username'];
       $pass = $_POST['password'];
 
+      # reset login errors
       $_SESSION['loginErr'] = array();
 
+      # to not have a cluttered session, just do a DB call to check for account existence
       $findUser = $conn->query("SELECT * FROM users WHERE username = '$username'");
+
       if($findUser === FALSE) {
-        addAlert("Something went wrong!<br>".$conn->error, "danger");
+        addAlert("<b>Uh oh!</b> Something went wrong! ".$conn->error, "danger");
       } else {
+        
+        # no rows with that username, meaning no account
         if($findUser->num_rows === 0) {
           array_push($_SESSION['loginErr'], 'username');
         } else {
+
           $user = $findUser->fetch_assoc();
   
+          # user found, now compare passwords
           if(strcmp($pass, $user['password']) !== 0) {
+
             array_push($_SESSION['loginErr'], 'password');
           } else {
+
+            # save user info as Succeed authentication (less Session clutter) and redirect
             $_SESSION['Succeed'] = array(
-              'id' => $user['user_ID'],
+              'id' => $user['user_id'],
               'username' => $user['username'],
               'type' => $user['type']
             );
@@ -67,8 +80,9 @@
       <div class="form-group">
         <label for="username">Username</label>
         <input type="text" name="username" id="username" class="form-control" required>
-        <?php if(checkErr('username')) { ?>
-        
+
+        <!-- show only if there are errors in this section from the php code above -->
+        <?php if(checkErr('username')) { ?>        
           <div class="invalid-feedback">
             That account does not exist. Click <a href="register.php">here</a> to register.
           </div>
@@ -78,6 +92,8 @@
       <div class="form-group">
         <label for="password">Password</label>
         <input type="password" name="password" id="password" class="form-control" required>
+
+        <!-- show only if there are errors in this section from the php code above -->
         <?php if(checkErr('password')) { ?>
           <div class="invalid-feedback">
             Incorrect password! Please try again.

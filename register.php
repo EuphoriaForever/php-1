@@ -26,17 +26,23 @@
       return isset($_SESSION['regErr'][$err]);
     }
 
+    # check if you hit the register button
     if(isset($_POST['register'])) {
+
+      # save inputs
       $username = $_POST['username'];
       $pass = $_POST['password'];
       $confirm = $_POST['confirm'];
 
+      # reset past errors
       $_SESSION['regErr'] = array();
 
+      # validation checking
       if(strlen($username) < 4) {
         $_SESSION['regErr']['username'] = 'Username must be at least 4 characters long.';
       }
 
+      # use a DB call to avoid Session clutter
       $findUsername = $conn->query("SELECT * FROM users WHERE username = '$username'");
 
       if($findUsername->num_rows > 0) {
@@ -51,17 +57,20 @@
         $_SESSION['regErr']['confirm'] = 'Passwords do not match.';
       }
 
+      # if there are no errors, save user info
       if(empty($_SESSION['regErr'])) {
         $register = "INSERT INTO users(username,password,type) VALUES('$username','$pass','user')";
 
+        # if query successful, add alert to be printed in login page and redirect, otherwise, flag an alert error on this page
         if($conn->query($register) === TRUE) {
           addAlert("Account successfully made! Please login below.", "success");
           header("Location: login-new.php");
         } else {
-          addAlert("Something went wrong!<br>".$conn->error, "danger");
+          addAlert("<b>Uh oh!</b> Something went wrong! ".$conn->error, "danger");
         }
       }
     } else {
+      # if this was just a refresh, clear error list and display any alerts
       $_SESSION['regErr'] = array();
       displayAlert();
     }
@@ -77,6 +86,8 @@
         <input type="text" name="username" id="username" 
         class="form-control <?php if(checkErr('username')) { echo 'is-invalid';} ?>" 
         required>
+
+        <!-- show only if there are errors in this section from the php code above -->
         <?php if(checkErr('username')) { ?>
           <div class="invalid-feedback">
             <?php echo $_SESSION['regErr']['username']; ?>
@@ -89,6 +100,8 @@
         <input type="password" name="password" id="password" 
         class="form-control <?php if(checkErr('password')) { echo 'is-invalid'; } ?>" 
         required>
+
+        <!-- show only if there are errors in this section from the php code above -->
         <?php if(checkErr('password')) { ?>
           <div class="invalid-feedback">
             <?php echo $_SESSION['regErr']['password']; ?>
@@ -101,6 +114,8 @@
         <input type="password" name="confirm" id="confirm" 
         class="form-control <?php if(checkErr('confirm')) { echo 'is-invalid'; } ?>"  
         required>
+
+        <!-- show only if there are errors in this section from the php code above -->
         <?php if(checkErr('confirm')) { ?>
           <div class="invalid-feedback">
             <?php echo $_SESSION['regErr']['confirm']; ?>
