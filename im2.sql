@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 5.0.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 23, 2020 at 05:57 AM
+-- Generation Time: Jun 24, 2020 at 03:13 PM
 -- Server version: 10.4.11-MariaDB
--- PHP Version: 7.4.6
+-- PHP Version: 7.4.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -50,7 +51,8 @@ INSERT INTO `attributes` (`attr_ID`, `attr_Name`, `datatype`, `limitation`, `isP
 (4, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 17),
 (5, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 18),
 (7, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 19),
-(9, 'Character_Owner', 'INT', 10, 0, 0, 0, 0, 0, 1, 17, 18);
+(9, 'Character_Owner', 'INT', 10, 0, 0, 0, 0, 0, 1, 17, 18),
+(10, 'Firstname', 'varchar', 255, 0, 0, 0, 0, 0, 0, 0, 17);
 
 -- --------------------------------------------------------
 
@@ -116,8 +118,16 @@ CREATE TABLE `rows` (
   `row_ID` int(10) NOT NULL,
   `rowNum` int(10) NOT NULL,
   `attr_ID` int(10) NOT NULL,
-  `val_ID` int(10) NOT NULL
+  `value` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `rows`
+--
+
+INSERT INTO `rows` (`row_ID`, `rowNum`, `attr_ID`, `value`) VALUES
+(2, 1, 4, '1'),
+(3, 1, 10, 'Josie');
 
 -- --------------------------------------------------------
 
@@ -164,17 +174,6 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `type`) VALUES
 (2, 'Kweenisma', 'Kweenisma18100432', 'user'),
 (3, 'DerekYu565', 'yeetyeetskrrt', 'user');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `val`
---
-
-CREATE TABLE `val` (
-  `val_ID` int(10) NOT NULL,
-  `valueName` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 --
 -- Indexes for dumped tables
 --
@@ -213,8 +212,7 @@ ALTER TABLE `permits`
 --
 ALTER TABLE `rows`
   ADD PRIMARY KEY (`row_ID`),
-  ADD KEY `rows_ibfk_1` (`attr_ID`),
-  ADD KEY `val_ID` (`val_ID`);
+  ADD KEY `rows_ibfk_1` (`attr_ID`) USING BTREE;
 
 --
 -- Indexes for table `tb`
@@ -230,12 +228,6 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`);
 
 --
--- Indexes for table `val`
---
-ALTER TABLE `val`
-  ADD PRIMARY KEY (`val_ID`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -243,7 +235,7 @@ ALTER TABLE `val`
 -- AUTO_INCREMENT for table `attributes`
 --
 ALTER TABLE `attributes`
-  MODIFY `attr_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `attr_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `db`
@@ -267,7 +259,7 @@ ALTER TABLE `permits`
 -- AUTO_INCREMENT for table `rows`
 --
 ALTER TABLE `rows`
-  MODIFY `row_ID` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `row_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tb`
@@ -280,12 +272,6 @@ ALTER TABLE `tb`
 --
 ALTER TABLE `users`
   MODIFY `user_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `val`
---
-ALTER TABLE `val`
-  MODIFY `val_ID` int(10) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -315,8 +301,7 @@ ALTER TABLE `permits`
 -- Constraints for table `rows`
 --
 ALTER TABLE `rows`
-  ADD CONSTRAINT `rows_ibfk_1` FOREIGN KEY (`attr_ID`) REFERENCES `attributes` (`attr_ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `rows_ibfk_2` FOREIGN KEY (`val_ID`) REFERENCES `val` (`val_ID`) ON DELETE CASCADE;
+  ADD CONSTRAINT `rows_ibfk_1` FOREIGN KEY (`attr_ID`) REFERENCES `attributes` (`attr_ID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `tb`
