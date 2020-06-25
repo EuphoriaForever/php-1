@@ -258,7 +258,7 @@
         echo '
                 <div class="jumbotron jumbotron-fluid ">
                      <div class="container"> 
-                         <h1 class="text-success">Welcome,  '.$_SESSION['users'][$_SESSION['Succeed']]['name'].' !</h1>
+                         <h1 class="text-success">Welcome,  '.$_SESSION['Succeed']['username'].' !</h1>
                          <h4 class="text-info">Database is: '.$db_Name.' </h4>
                          <hr>
                          
