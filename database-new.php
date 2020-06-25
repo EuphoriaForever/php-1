@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="./styles/bootstrap.min.css">
     <link rel="stylesheet" href="./styles/chess.css">
   <title>Database</title>
@@ -67,6 +68,7 @@
 
       # get permissions for table
       $permitted = array();
+      $admins = array();
 
       # add all admins
       $getAdmins = $conn->query("SELECT * FROM users WHERE type = 'administrator'");
@@ -75,7 +77,7 @@
 
         # add all admins to permitted array with "All access"
         while($admin = $getAdmins->fetch_assoc()) {
-          $permitted[$admin['username']] = array("All Access");
+          array_push($admins, $admin['username']);
         }
       }
 
@@ -105,27 +107,24 @@
             } else if ($checkPerms->num_rows > 0) {
 
               # if they don't have complete perms, find these operations one by one
-              while($permission = $checkPerms->fetch_assoc()) {
-                $opID = $permission['operation'];
-                
-                # search for the operation name in operations table
-                $findOp = $conn->query("SELECT * FROM operations WHERE op_ID = $opID");
+              $opID = $permittedUser['operation'];
+              
+              # search for the operation name in operations table
+              $findOp = $conn->query("SELECT * FROM operations WHERE op_ID = $opID");
 
-                if($findOp->num_rows > 0) {
-                  $operation = $findOp->fetch_assoc();
+              if($findOp->num_rows > 0) {
+                $operation = $findOp->fetch_assoc();
 
-                  # add the operation to the user's array of permissions
-                  if(isset($permitted[$user])) {
+                # add the operation to the user's array of permissions
+                if(isset($permitted[$user])) {
 
-                    # if they already have a pre-exsiting array, push into it
-                    array_push($permitted[$user], $operation['operation']);
-                  } else {
+                  # if they already have a pre-exsiting array, push into it
+                  array_push($permitted[$user], $operation['operation']);
+                } else {
 
-                    # if not, create an array for the user
-                    $permitted[$user] = array($operation['operation']);
-                  }
+                  # if not, create an array for the user
+                  $permitted[$user] = array($operation['operation']);
                 }
-
               }
             }
             
@@ -369,7 +368,7 @@
 
     <!-- permissions list modal BOC -->
     <div class="modal fade" id="permissions" role="dialog" tabindex="-1" aria-labelledby="permissionsHeader" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="permissionsHeader">User Permissions</h5>
@@ -381,14 +380,19 @@
 
           <div class="modal-body">
           <!-- if you can found the author before, print it -->
-            <?php if(isset($db['author'])) { ?>
-              <p>
-                <b>Author:</b> <?php echo $db['author']; ?>
-              </p>
-            <?php } ?>
+            <div class="row align-items-center justify-content-between mx-3 mb-3">
+              <?php if(isset($db['author'])) { ?>
+                <p class="col-3">
+                  <b>Author:</b> <?php echo $db['author']; ?>
+                </p>
+              <?php } ?>
+            
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addPermission"><i class="fa fa-plus mr-1"></i> Add Permission</button>
+            </div>
+
 
             <!-- if no extra permissions, say so. If there are, print it. -->
-            <?php if(empty($permitted)) { ?>
+            <?php if(empty($permitted) && empty($admins)) { ?>
               <h5 class="text-center font-weight-bold">There are no extra permissions for this table.</h5>
             <?php } else { ?>
               <table class="table table-striped">
@@ -396,32 +400,43 @@
                   <tr>
                     <th scope="col">User</th>
                     <th scope="col">Operation</th>
+                    <th></th>
                   </tr>
                 </thead>
 
                 <tbody>
                 <!-- go through the list of permitted users -->
-                  <?php foreach($permitted as $user => $userPerms) {?>
-                    <td><?php echo $user; ?></td>
-                    <td>
-                      <?php 
-
-                        # go through their permissions array
-                        foreach($userPerms as $ind => $perm) {
+                  <?php foreach($admins as $admin) {?>
+                    <tr>
+                      <td><?php echo $admin; ?></td>
+                      <td>All Access</td>
+                      <td></td>
+                    </tr>
+                  <?php } 
+                  
+                    foreach($permitted as $user => $userPerms) { ?>
+                    <tr>
+                      <td><?php echo $user; ?></td>
+                      <td>
+                        <?php 
                           $str = "";
 
-                          if($ind > 0) {
+                          foreach($userPerms as $ind => $perm) {
 
-                            # add a comma if the permission is not first on the list
-                            $str .= ", ";
+                            if($ind > 0) {
+                              $str .= ", ";
+                            }
+
+                            $str .= $perm;
                           }
 
-                          $str .= $perm;
-
                           echo $str;
-                        }
-                      ?>
-                    </td>
+                        ?>
+                      </td>
+                      <td>
+                          <button type="button" class="btn btn-primary"> Edit Permission</button>
+                      </td>
+                    </tr>
                   <?php } ?>
                 </tbody>
               </table>
@@ -431,6 +446,75 @@
       </div>
     </div>
     <!-- permissions list modal EOC -->
+
+    <!-- new permission modal BOC -->
+    <div class="modal fade" id="addPermission" role="dialog" tabindex="-1" aria-labelledby="addPermissionHeader" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addPermissionHeader">Add New Database Permission</h5>
+
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <form action="addPermission.php" method="post">
+            <div class="modal-body">
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="user">Choose User</label>
+                  <select name="user" id="user" class="form-control">
+                    <option value="0" style="display: none">Choose User...</option>
+                    
+                    <!-- lets print all our users saved in allUsers array -->
+                    <?php foreach($allUsers as $id => $user) { ?>
+                      <option value="<?php echo $id; ?>"><?php echo $user; ?></option>
+                    <?php } ?>
+
+                  </select>
+                </div>
+
+                <div class="form-group col-6">
+                  <label class="hidden">Empty</label>
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" name="permissions[]" class="custom-control-input" id="create" value="1">
+                        <label class="custom-control-label" for="create">Create</label>
+                      </div>
+
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" name="permissions[]" id="read" class="custom-control-input" value="2">
+                        <label for="read" class="custom-control-label">Read</label>
+                      </div>
+                    </div>
+
+                    <div class="col-6">
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" name="permissions[]" id="update" class="custom-control-input" value="3">
+                        <label for="update" class="custom-control-label">Update</label>
+                      </div>
+
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" name="permissions[]" id="delete" class="custom-control-input" value="4">
+                        <label for="delete" class="custom-control-label">Delete</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-success" name="submit">Add Permission</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- new permission modal EOC -->
 
   <!-- modals EOC -->
 
