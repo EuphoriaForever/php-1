@@ -23,21 +23,48 @@
     $getDBQuery = "SELECT * FROM db WHERE db_ID = $db_id";
     $dbResult = $conn->query($getDBQuery);
     
+    # check permission functions
+
+    function isAllowed($op) {
+      return in_array($op, $GLOBALS['permissions']);
+    }
+
     # check if db with that ID exists
     if($dbResult->num_rows > 0) {
       # actions here
 
       $dbRow = $dbResult->fetch_assoc();
       $db = array('name' => $dbRow['db_Name']);
-
+      
       # get author of table
       $authorID = $dbRow['Author'];
       $getAuthorResult = $conn->query("SELECT * FROM users WHERE user_id = $authorID");
-
+      
       if($getAuthorResult->num_rows > 0) {
         $author = $getAuthorResult->fetch_assoc();
         $db['author'] = $author['username'];
         $db['authorID'] = $author['user_id'];
+      }
+      
+      # get your permissions
+      $permissions = array();
+
+      if($_SESSION['Succeed']['type'] === 'administrator' || $db['authorID'] === $_SESSION['Succeed']['id']) {
+
+        # if admin, add all perms
+        array_push($permissions, 1, 2, 3, 4);
+      } else {
+
+        # if user, add only allowed perms
+        $checkPermit = $conn->query("SELECT * FROM permits WHERE user_ID = ".$_SESSION['Succeed']['id']." AND db = $db_id");
+
+        if($checkPermit) {
+          if($checkPermit->num_rows > 0) {
+            while($permit = $checkPermit->fetch_assoc()) {
+              array_push($permissions, $permit['operation']);
+            }
+          }
+        }
       }
 
       # get all tables of that database
@@ -200,12 +227,18 @@
 
   <!-- main container BOC -->
   <div class="container col-6 mx-auto p-5 my-5 bg-white shadow rounded">
-    <button type="button" class="btn btn-success " data-toggle="modal" data-target="#createTable">New Table</button>
-    
-    <a class="btn btn-danger" href="deleteDB.php?delete_id=<?php echo $_GET['db_id'] ?>">Delete Database</a>
-    
-    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editDB">Edit Database</button>
+    <?php if(isAllowed(1)) { ?>
+      <button type="button" class="btn btn-success " data-toggle="modal" data-target="#createTable">New Table</button>
+    <?php } ?>
 
+    <?php if(isAllowed(3)) { ?>
+      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editDB">Edit Database</button>
+    <?php } ?>
+    
+    <?php if(isAllowed(4)) { ?>
+      <a class="btn btn-danger" href="deleteDB.php?delete_id=<?php echo $_GET['db_id'] ?>">Delete Database</a>
+    <?php } ?>
+    
     <button class="btn btn-dark" data-toggle="modal" data-target="#permissions">Permissions</button>
 
     <hr>
@@ -225,18 +258,29 @@
               <h2 class="mb-0 row justify-content-between">
                 <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-<?php echo $ind; ?>" aria-expanded="false" aria-controls="collapse-<?php echo $ind; ?>"><?php echo $tb['name']; ?></button>
 
-                <div class="dropdown">
-                  <button class="btn dropdown-toggle btn-outline-dark border-0" type="button" id="tableSettings-<?php echo $ind; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-cog"></i>
-                  </button>
+                <?php if(!empty($permissions)) { ?>
+                  <div class="dropdown">
+                    <button class="btn dropdown-toggle btn-outline-dark border-0" type="button" id="tableSettings-<?php echo $ind; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-cog"></i>
+                    </button>
+  
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="tableSettings-<?php echo $ind; ?>">
 
-                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="tableSettings-<?php echo $ind; ?>">
-                    <a href="database.php?pk=1&tb_id=<?php echo $tb['id']; ?>&db_id=<?php echo $db_id; ?>" class="dropdown-item">Create a Primary Key (ID)</a>
-                    <button type="button" class="dropdown-item" data-toggle="modal" data-target="#createAttr-<?php echo $ind; ?>">Create Attribute</button>
-                    <a href="editTB.php?id=<?php echo $tb['id']; ?>" class="dropdown-item">Edit Table</a>
-                    <a href="deleteTable.php?id=<?php echo $tb['id']; ?>" class="dropdown-item alert-danger border-top">Delete Table</a>
+                      <?php if(isAllowed(1)) { ?>
+                        <a href="database.php?pk=1&tb_id=<?php echo $tb['id']; ?>&db_id=<?php echo $db_id; ?>" class="dropdown-item">Create a Primary Key (ID)</a>
+                        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#createAttr-<?php echo $ind; ?>">Create Attribute</button>
+                      <?php } ?>
+
+                      <?php if(isAllowed(3)) { ?>
+                        <a href="editTB.php?id=<?php echo $tb['id']; ?>" class="dropdown-item">Edit Table</a>
+                      <?php } ?>
+
+                      <?php if(isAllowed(4)) { ?>
+                        <a href="deleteTable.php?id=<?php echo $tb['id']; ?>" class="dropdown-item alert-danger border-top">Delete Table</a>
+                      <?php } ?>
+                    </div>
                   </div>
-                </div>
+                <?php } ?>
 
               </h2>
             </div>
@@ -463,7 +507,9 @@
                 </p>
               <?php } ?>
             
-              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addPermission"><i class="fa fa-plus mr-1"></i> Add Permission</button>
+              <?php if(isAllowed(1)) { ?>
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addPermission"><i class="fa fa-plus mr-1"></i> Add Permission</button>
+              <?php } ?>
             </div>
 
 
@@ -510,10 +556,15 @@
                         ?>
                       </td>
                       <td>
+                        <?php if(isAllowed(3)) { ?>
                           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editPerms-<?php echo $info['id']; ?>"><i class="fa fa-edit mr-1"></i> Edit</button>
+                        <?php } ?>
+
+                        <?php if(isAllowed(4)) { ?>
                           <a href="clearPerms.php?clearPerms=true&user=<?php echo $info['id'] ?>&db_id=<?php echo $db_id; ?>" class="btn btn-danger">
                             <i class="fa fa-trash mr-1"></i> Clear Permissions
                           </a>
+                        <?php } ?>
                       </td>
                     </tr>
                   <?php } ?>
