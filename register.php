@@ -16,20 +16,22 @@
     include "connectDB.php";
     include "./includes/navIntro.php";
     
-    if(!isset($_SESSION['regErr'])) {
-      $_SESSION['regErr'] = array();
-    }
-    
-    # usable functions
-    function checkErr($err) {
-      return in_array($err, $_SESSION['regErr']);
+    # if you are logged in, you can't visit this page
+    if(isset($_SESSION['Succeed'])) {
+      header("Location: welcome.php");
     }
 
+    # usable functions
+    function checkErr($err) {
+      return isset($_SESSION['regErr'][$err]);
+    }
 
     if(isset($_POST['register'])) {
       $username = $_POST['username'];
       $pass = $_POST['password'];
       $confirm = $_POST['confirm'];
+
+      $_SESSION['regErr'] = array();
 
       if(strlen($username) < 4) {
         $_SESSION['regErr']['username'] = 'Username must be at least 4 characters long.';
@@ -54,16 +56,16 @@
 
         if($conn->query($register) === TRUE) {
           addAlert("Account successfully made! Please login below.", "success");
-          header("Location: login.php");
+          header("Location: login-new.php");
         } else {
           addAlert("Something went wrong!<br>".$conn->error, "danger");
         }
       }
     } else {
       $_SESSION['regErr'] = array();
+      displayAlert();
     }
 
-    displayAlert();
   ?>
 
   <div class="container bg-white w-50 mx-auto p-5 my-5 shadow rounded">

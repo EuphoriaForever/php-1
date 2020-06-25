@@ -3,84 +3,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
   <link rel="stylesheet" href="./styles/bootstrap.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
+  <link rel="stylesheet" href="./styles/chess.css">
+  <title>Register</title>
 </head>
 <body class="bg-secondary">
   <?php
+    # start session, connect to database, print navbar
+    session_start();
+    include "connectDB.php";
     include "./includes/navIntro.php";
-    
-    session_start(); #start session in each form validation page so that we can all access the super global var $_SESSION
 
-    if(isset($_SESSION['Succeed'])) { # if there is already a detected login session, redirect to welcome page
+    # if you are logged in, you can't visit this page
+    if(isset($_SESSION['Succeed'])) {
       header("Location: welcome.php");
     }
 
-    if(isset($_SESSION['newAccount'])) { # if you're redirected here from register.php because you just made a new account, show this alert banner then unset the newAccount session alert so that it does not keep appearing
-      echo "<div class='alert alert-success w-50 mx-auto my-4'>Account successfully made! Please login below. </div>";
-      unset($_SESSION['newAccount']);
+    # usable functions
+    function checkErr($err) {
+      return in_array($err, $_SESSION['loginErr']);
     }
 
-    if(isset($_POST['login'])) { #if you're trynna login, check credentials here
+    if(isset($_POST['login'])) {
+      $username = $_POST['username'];
+      $pass = $_POST['password'];
 
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+      $_SESSION['loginErr'] = array();
 
-      $conn = new mysqli("localhost","root","","im2");
-      if($conn->connect_error){
-        die("Connection failed: " . $conn->connect_error);
-       }//end of checking for connection error
-
-       $sql = "SELECT * FROM users WHERE username='$username'";
-       $result = $conn->query($sql);
-       if($result->num_rows > 0 ){
-        $row = $result->fetch_assoc();
-        if($_POST['password'] === $row['password']){
-          #I have to create 
-          $_SESSION['users'][$row['username']] =  array('id'=>$row['user_id'],'password' => $row['password'], 'type' => $row['type'] , 'name' => $row['username']);
-          $_SESSION['Succeed'] = $_POST['username'];
-          header("Location: welcome.php");
-        }else{
-          echo "<div class='alert alert-danger w-50 mx-auto my-4'>You have given the wrong password!</div>";
+      $findUser = $conn->query("SELECT * FROM users WHERE username = '$username'");
+      if($findUser === FALSE) {
+        addAlert("Something went wrong!<br>".$conn->error, "danger");
+      } else {
+        if($findUser->num_rows === 0) {
+          array_push($_SESSION['loginErr'], 'username');
+        } else {
+          $user = $findUser->fetch_assoc();
+  
+          if(strcmp($pass, $user['password']) !== 0) {
+            array_push($_SESSION['loginErr'], 'password');
+          } else {
+            $_SESSION['Succeed'] = array(
+              'id' => $user['user_ID'],
+              'username' => $user['username'],
+              'type' => $user['type']
+            );
+            header("Location: welcome.php");
+          }
         }
-        
-       }else{
-            $_SESSION['err'] = "no_account";
-            header("Location: register.php");
-       }
-
-
+      }
+    } else {
+      $_SESSION['loginErr'] = array();
     }
-
+    
+    displayAlert();
   ?>
 
-  <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
+  <div class="container bg-white w-50 mx-auto p-5 my-5 shadow rounded">
     <h2 class="font-weight-bold">Login</h2>
     <hr>
-    <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post" class="d-flex flex-column justify-content-center">
+    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" id="login">
       <div class="form-group">
-        <label for="username" class="font-weight-bold">Username</label>
+        <label for="username">Username</label>
         <input type="text" name="username" id="username" class="form-control" required>
+        <?php if(checkErr('username')) { ?>
+        
+          <div class="invalid-feedback">
+            That account does not exist. Click <a href="register.php">here</a> to register.
+          </div>
+        <?php } ?>
       </div>
 
       <div class="form-group">
-        <label for="password" class="font-weight-bold">Password</label>
+        <label for="password">Password</label>
         <input type="password" name="password" id="password" class="form-control" required>
+        <?php if(checkErr('password')) { ?>
+          <div class="invalid-feedback">
+            Incorrect password! Please try again.
+          </div>
+        <?php } ?>
       </div>
 
-      <button type="submit" name="login" class="btn btn-success">Login</button>
-      <small>No account? <a href="./register.php">Register</a></small>
+      <hr>
+
+      <div class="form-group">
+        <button type="submit" name="login" class="btn btn-success w-100 mb-2">Login</button>
+        <small>Don't have an account? <a href="register.php">Register</a></small>
+      </div>
     </form>
   </div>
 
-  <script src="./scripts/bootstrap.min.js"></script>
-       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-       <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+   <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="./scripts/bootstrap.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
 </body>
 </html>
