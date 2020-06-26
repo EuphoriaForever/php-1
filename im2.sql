@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 25, 2020 at 05:56 PM
+-- Generation Time: Jun 26, 2020 at 04:59 AM
 -- Server version: 10.4.8-MariaDB
 -- PHP Version: 7.3.11
 
@@ -36,10 +36,7 @@ CREATE TABLE `attributes` (
   `isPrimary` tinyint(1) NOT NULL,
   `isAutoInc` tinyint(1) NOT NULL,
   `isNull` tinyint(1) NOT NULL,
-  `isParent` tinyint(1) NOT NULL,
-  `ParentOf` int(10) DEFAULT NULL,
   `isFK` tinyint(1) NOT NULL,
-  `FK_of` int(10) NOT NULL,
   `tb_ID` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -47,12 +44,11 @@ CREATE TABLE `attributes` (
 -- Dumping data for table `attributes`
 --
 
-INSERT INTO `attributes` (`attr_ID`, `attr_Name`, `datatype`, `limitation`, `isPrimary`, `isAutoInc`, `isNull`, `isParent`, `ParentOf`, `isFK`, `FK_of`, `tb_ID`) VALUES
-(4, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 17),
-(5, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 18),
-(7, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 19),
-(9, 'Character_Owner', 'INT', 10, 0, 0, 0, 0, 0, 1, 17, 18),
-(10, 'Firstname', 'varchar', 255, 0, 0, 0, 0, 0, 0, 0, 17);
+INSERT INTO `attributes` (`attr_ID`, `attr_Name`, `datatype`, `limitation`, `isPrimary`, `isAutoInc`, `isNull`, `isFK`, `tb_ID`) VALUES
+(4, 'ID', 'INT', 10, 1, 1, 0, 0, 17),
+(5, 'ID', 'INT', 10, 1, 1, 0, 0, 18),
+(7, 'ID', 'INT', 10, 1, 1, 0, 0, 19),
+(10, 'Firstname', 'varchar', 255, 0, 0, 0, 0, 17);
 
 --
 -- Indexes for dumped tables
