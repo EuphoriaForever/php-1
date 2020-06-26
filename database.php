@@ -1,13 +1,16 @@
 <html>
+
 <head>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="./styles/bootstrap.min.css">
-    <title>Database</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles/bootstrap.min.css">
+  <title>Database</title>
 </head>
+
 <body class="bg-secondary">
-     
-    <?php
+
+  <?php
   // include "./includes/navbar.php";
 
     session_start(); #start session in each form validation page so that we can all access the super global var $_SESSION
@@ -33,68 +36,77 @@
 
     
   ?>
-             <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
-                    <!--Adding Table BOC-->
-                    <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal">
-                         New Table
-                     </button>
-                     <a class="btn btn-danger" href="database.php?delete_ID=<?php echo $_GET['db_id'] ?>">Delete Database</a>
-                     <a class="btn btn-info" href="editDB.php?db_ID=<?php echo $_GET['db_id'] ?>">Edit Database</a>
-                    <!-- Modal -->
-                    <div class="modal fade text-dark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">What's in a name...</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div><!--modal header EOC-->
-                                     <!--Content within the modal modal-content BOC-->
-                                        <form action="database.php" method="POST" enctype="multipart/form-data">
-                                            <div class="form-row">
-                                                    <div class="form-group col-md-6">
-                                                        <label for="tbName">Table Name</label>
-                                                        <input type="text" class="form-control" name="tbName" placeholder="Enter table name" required>
-                                                   </div>
-                                            </div><!--form row EOC-->
+  <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
+    <!--Adding Table BOC-->
+    <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal">
+      New Table
+    </button>
+    <a class="btn btn-danger" href="database.php?delete_ID=<?php echo $_GET['db_id'] ?>">Delete Database</a>
+    <a class="btn btn-info" href="editDB.php?db_ID=<?php echo $_GET['db_id'] ?>">Edit Database</a>
+    <!-- Modal -->
+    <div class="modal fade text-dark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">What's in a name...</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <!--modal header EOC-->
+          <!--Content within the modal modal-content BOC-->
+          <form action="database.php" method="POST" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="tbName">Table Name</label>
+                <input type="text" class="form-control" name="tbName" placeholder="Enter table name" required>
+              </div>
+            </div>
+            <!--form row EOC-->
 
-                                            <input type="hidden" class="form-control" name="db_id" value="<?php echo $_GET['db_id']?>" required>
-                                            
-                                                <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
-                                                <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
-                                        </form><!--EOC form-->
-                                     </div><!-- modal-content EOC-->
-                             </div><!--Modal-dialog EOC-->
-                     </div><!--MODAL EOC-->
-                     <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                            Permit List
-                     </button>
-                            
-                      <div class="collapse" id="collapseExample">
-                      
-                          <div class="card card-body">
-                              <!--The adding of new permits-->
-                              <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModaliver">
-                                  New Permit
-                              </button>
-                              <br>
-                              <h5 class="text-info text-center">Users Permitted On This Database </h5>
-                    
-                              <!-- Modal -->
-                            <div class="modal fade text-dark" id="exampleModaliver" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                         <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Who do you want to be able to CRUD here</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                 </div><!--modal header EOC-->
-                                                  <!--Content within the modal modal-content BOC-->
-                                                   <form action="database.php" method="POST" enctype="multipart/form-data">
-                                                   <!--Dynamic Permit List and Dynamic Modal for Permit-->
-                                      <?php
+            <input type="hidden" class="form-control" name="db_id" value="<?php echo $_GET['db_id']?>" required>
+
+            <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
+            <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
+          </form>
+          <!--EOC form-->
+        </div><!-- modal-content EOC-->
+      </div>
+      <!--Modal-dialog EOC-->
+    </div>
+    <!--MODAL EOC-->
+    <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample"
+      aria-expanded="false" aria-controls="collapseExample">
+      Permit List
+    </button>
+
+    <div class="collapse" id="collapseExample">
+
+      <div class="card card-body">
+        <!--The adding of new permits-->
+        <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModaliver">
+          New Permit
+        </button>
+        <br>
+        <h5 class="text-info text-center">Users Permitted On This Database </h5>
+
+        <!-- Modal -->
+        <div class="modal fade text-dark" id="exampleModaliver" tabindex="-1" role="dialog"
+          aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Who do you want to be able to CRUD here</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <!--modal header EOC-->
+              <!--Content within the modal modal-content BOC-->
+              <form action="database.php" method="POST" enctype="multipart/form-data">
+                <!--Dynamic Permit List and Dynamic Modal for Permit-->
+                <?php
                                          $db_id = $_GET['db_id'];
 
                                          $conn = new mysqli("localhost","root","","im2");
@@ -214,7 +226,7 @@
                                                           <tr>
                                                                   <td>'.$username.'</td>
                                                                   <td>'.$operation.'</td>
-                                                                  <td></td>
+                                                                  <td><td><a class="btn btn-danger" href="database.php?delete_Permit='.$permit_ID.'&db_id='.$db_id.'">Delete Permit</a></td></td>
                                                           </tr>
                                                        ';   
 
@@ -224,21 +236,17 @@
                                               
 
                                            //We will also try to include other users who aren't the author/admin but are given access, assuming there are any.
-                                           mysqli_close($conn); 
                                            ?>
-                                      </tbody>
-                                  </table>
-                          </div><!--CARD BODY EOC-->
-                      </div><!--COLLAPSE EOC-->
-                  
-<?php
- 
-    $db_id = isset($_GET['db_id']) ? $_GET['db_id'] : $_POST['db_id'];
+                </tbody>
+                </table>
+            </div>
+            <!--CARD BODY EOC-->
+          </div>
+          <!--COLLAPSE EOC-->
 
-    $conn = new mysqli("localhost","root","","im2");
-    if($conn->connect_error){
-     die("Connection failed: " . $conn->connect_error);
-    }
+          <?php
+ 
+    $db_id = $_GET['db_id'] ;
 
     $sql = "SELECT * FROM db WHERE db_ID = $db_id";
     $result = $conn->query($sql);
@@ -250,7 +258,7 @@
         echo '
                 <div class="jumbotron jumbotron-fluid ">
                      <div class="container"> 
-                         <h1 class="text-success">Welcome,  '.$_SESSION['users'][$_SESSION['Succeed']]['name'].' !</h1>
+                         <h1 class="text-success">Welcome,  '.$_SESSION['Succeed']['username'].' !</h1>
                          <h4 class="text-info">Database is: '.$db_Name.' </h4>
                          <hr>
                          
@@ -284,14 +292,65 @@
                           <div id="collapse'.$num.'" class="collapse" aria-labelledby="heading'.$num.'" data-parent="#accordionExample">
                           <div class="card-body">
                             <a class="btn btn-danger" href="database.php?del_tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Delete Table</a>
-                            <a class="btn btn-info" href="editTB.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Edit Table</a>
                             <a class="btn btn-success" href="database.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Create a Primary Key (ID)</a>
+                            <a class="btn btn-info" href="editTB.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Edit Table</a>
+                            <a class="btn btn-success" href="addRow.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Add to Rows</a>
                             
                             <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal'.$num.'">
                                  Create an Attribute
-                             </button>
-                           
-                            
+                            </button>
+                             ';
+                              /// PHP CODE TO DISPLAY THE TABLE HERE
+                              $sql = "SELECT * FROM attributes WHERE tb_ID=".$row2['tb_ID'];
+                              $attributeList = $conn->query($sql);
+                              if($attributeList != null && $attributeList->num_rows > 0){
+                                // populating ATTRIBUTE ARRAY
+                                $attributeArray = array();
+                                while($attribute = $attributeList->fetch_assoc()){
+                                  if($attribute['isPrimary'] == 1){ // if primary key move to the front of the array
+                                    array_unshift($attributeArray, $attribute);
+                                  } else {
+                                    $attributeArray[] = $attribute;
+                                  }
+                                }
+                                // bell of displaying values ding ding ding
+                                $sql = "SELECT * FROM `rows` WHERE `rowNum`=1 AND `attr_ID`=".$attributeArray[0]['attr_ID'];
+                                $check = $conn->query($sql); 
+                                // Checks if the primary key's first row has a value, if it doesn't it means the table is empty
+                                if($check!=null && $check->num_rows>0){
+                                  echo "<table class='table'><thead><tr>";
+                                  for($ctr=0; $ctr<count($attributeArray); $ctr++){
+                                    echo "<th>".$attributeArray[$ctr]['attr_Name']."</th>";
+                                  }
+                                  echo "</tr></thead>";
+                                  $rowNum=1;
+                                  do{
+                                    echo "<tr>";
+                                    for($ctr=0; $ctr<count($attributeArray); $ctr++){
+                                      $sql = "SELECT * FROM `rows` WHERE `rowNum`=$rowNum AND `attr_ID`=".$attributeArray[$ctr]['attr_ID'];
+                                      $cell = $conn->query($sql);
+                                      if($cell!=null && $cell->num_rows>0){
+                                        $value = $cell->fetch_assoc();
+                                        echo "<td>".$value['value']."</td>";
+                                      } else {
+                                        echo "<td><i>emptyfield草</i></td>";
+                                      }
+                                    }
+                                    echo "</tr>";
+                                    // check if the next row num exists
+                                    $rowNum++;
+                                    $sql = "SELECT value FROM `rows` WHERE `rowNum`=$rowNum AND `attr_ID`=".$attributeArray[0]['attr_ID'];
+                                    $check = $conn->query($sql);
+                                  }while($check!=null && $check->num_rows>0);
+                                  echo "</table>";
+                                } else {
+                                  // table is empty because there is no first row primary key
+                                }
+                              } else {
+                                // attribute list is empty
+                              }
+                              // END OF KP CODE
+                              echo '
                             <div class="modal fade text-dark" id="exampleModal'.$num.'" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                             <div class="modal-content">
@@ -301,7 +360,6 @@
                                                         <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
-                                             
                                                 <form action="database.php" method="POST" enctype="multipart/form-data">
                                                     <div class="form-row">
                                                             <div class="form-group col-md-5">
@@ -418,13 +476,14 @@
                   </div>
                 </div> ';      
     }
-    mysqli_close($conn); 
    ?>
-                </div><!--jumbotron EOC-->
-            </div><!--Container EOC-->
-           
+        </div>
+        <!--jumbotron EOC-->
+      </div>
+      <!--Container EOC-->
 
  <?php
+ 
   $conn = new mysqli("localhost","root","","im2");
   if($conn->connect_error){
    die("Connection failed: " . $conn->connect_error);
@@ -434,9 +493,9 @@
             $dbID = $_POST['db_id'];
             $tb_Name = $_POST['tbName'];
 
-            $isOkay = checkPermit(1,$dbID);
+            $isOkay = checkPermit('1',$dbID,$conn);
 
-            if($isOkay===TRUE){
+            if($isOkay==TRUE){
                   $sql = "INSERT INTO tb (tb_ID,tb_Name,db_ID) VALUES ('','$tb_Name','$dbID')";
                   if($conn->query($sql)===TRUE){   
                         //Supposedly after inserting into tb, mureload ang kani na page parin with the $_GET['db_id'] parin pero it won't be passed as well for some reason
@@ -464,42 +523,44 @@
         
          # Here we check for any errors or mishaps
 
+         $isOkay = checkPermit('1',$db_ID,$conn);
 
-        if($isPrimary=="1"){
-          #we are checking if there already exists a PK
-                $checkPK = "SELECT * FROM attributes WHERE isPrimary = 1 AND tb_ID = $tb_ID";
-                $checkQuery = $conn->query($checkPK);
-                $hasPK = $checkQuery->num_rows;
+         if($isOkay==TRUE){
+                if($isPrimary=="1"){
+                            #we are checking if there already exists a PK
+                            $checkPK = "SELECT * FROM attributes WHERE isPrimary = 1 AND tb_ID = $tb_ID";
+                            $checkQuery = $conn->query($checkPK);
+                            $hasPK = $checkQuery->num_rows;
 
-                if($hasPK >0){
-                    echo "<script language='javascript'>alert('That table already has a primary key!');window.location.href='database.php?db_id=$db_ID';</script>";
-                }else{
-                  $isOkay = TRUE;
-                }
-        }else{
-          
-                if($isFK === "1"){
-                      if($FK_of === "0"){
-                        echo "<script language='javascript'>alert('You did not specify which table your attribute is an FK of');window.location.href='database.php?db_id=$db_ID';</script>";
-                      }else{
-                            $sql = "SELECT * FROM attributes WHERE isPrimary = 1 and tb_ID = $FK_of ";
-                            $result = $conn->query($sql);
-                            if($result->num_rows>0){
-                              $row = $result->fetch_assoc();
-                              $attr_ID = $row['attr_ID'];
-
-                                $sql2 = "UPDATE attributes SET isParent = '1' , ParentOf = '$tb_ID' WHERE attr_ID = $attr_ID";
-                                if($conn->query($sql2)===TRUE){
-                                    $isOkay = TRUE;
-                                }
+                            if($hasPK >0){
+                                   echo "<script language='javascript'>alert('That table already has a primary key!');window.location.href='database.php?db_id=$db_ID';</script>";
+                            }else{
+                                   $isOkay = TRUE;
                             }
+               }else{
+          
+                      if($isFK === "1"){
+                            if($FK_of === "0"){
+                                     echo "<script language='javascript'>alert('You did not specify which table your attribute is an FK of');window.location.href='database.php?db_id=$db_ID';</script>";
+                             }else{
+                                     $sql = "SELECT * FROM attributes WHERE isPrimary = 1 and tb_ID = $FK_of ";
+                                     $result = $conn->query($sql);
+                                      if($result->num_rows>0){
+                                          $row = $result->fetch_assoc();
+                                          $attr_ID = $row['attr_ID'];
 
+                                          $sql2 = "UPDATE attributes SET isParent = '1' , ParentOf = '$tb_ID' WHERE attr_ID = $attr_ID";
+                                              if($conn->query($sql2)===TRUE){
+                                                $isOkay = TRUE;
+                                              }
+                                       }
+
+                              }
+
+                      }else{
+                        $isOkay = TRUE;
                       }
-
-                }else{
-                  $isOkay = TRUE;
                 }
-        }
 
                     #after all of the checking, we see if we're still good to input the new attribute
 
@@ -509,33 +570,53 @@
                       echo "<script language='javascript'>alert('A new Attribute has been created!');window.location.href='database.php?db_id=$db_ID';</script>";
                     }
                   }
+
+           }else{
+                 echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this DB');window.location.href='database.php?db_id=$db_ID';</script>";
+            }
+
           
         }
 
         if(isset($_GET['delete_ID'])){
             $db_ID = $_GET['delete_ID'];
+
+        $isOkay = checkPermit('4',$db_ID,$conn);
+
+        if($isOkay==TRUE){   
             $sql = "DELETE FROM db WHERE db_ID= $db_ID";
             if($conn->query($sql)===TRUE){
                 echo "<script language='javascript'>alert('Database Successfully Deleted!');window.location.href='welcome.php';</script>";
-              
-              
+ 
             }
+          }else{
+            echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this DB');window.location.href='database.php?db_id=$db_ID';</script>";
+          }
         }
 
         if(isset($_GET['del_tb_ID'])){
           $tb_ID = $_GET['del_tb_ID'];
           $db_ID = $_GET['db_id'];
 
-          $sql = "DELETE FROM tb WHERE tb_ID = $tb_ID";
-          if($conn->query($sql)===TRUE){
-            echo "<script language='javascript'>alert('A table has been deleted');window.location.href='database.php?db_id=$db_ID';</script>";
-          }
+          $isOkay = checkPermit('4',$db_ID,$conn);
 
+          if($isOkay==TRUE){       
+                $sql = "DELETE FROM tb WHERE tb_ID = $tb_ID";
+                if($conn->query($sql)===TRUE){
+                      echo "<script language='javascript'>alert('A table has been deleted');window.location.href='database.php?db_id=$db_ID';</script>";
+                }
+          }else{
+               echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$db_ID';</script>";
+            }
         }
 
-        if(isset($_GET['tb_ID'])){
+    if(isset($_GET['tb_ID'])){
           $tb_ID = $_GET['tb_ID'];
           $dbID = $_GET['db_id'];
+
+      $isOkay = checkPermit('1',$dbID,$conn);
+
+      if($isOkay==TRUE){  
             $checkPK = "SELECT * FROM attributes WHERE isPrimary = 1 AND tb_ID = $tb_ID";
             $checkQuery = $conn->query($checkPK);
             $hasPK = $checkQuery->num_rows;
@@ -558,11 +639,48 @@
              
                  }
              }
-          }
+        }else{
+              echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$dbID';</script>";
+        }
+    }
+
+    if(isset($_POST['submitPermit'])){
+        $user = $_POST['user'];
+        $operation = $_POST['operation'];
+        $db_id = $_POST['db_id'];
+
+        $isOkay = checkPermit('1',$db_id,$conn);
+
+        if($isOkay == TRUE){
+              $sql = "INSERT INTO permits (permit_ID,operation,user_ID,db) VALUES ('','$operation','$user','$db_id')";
+              if($conn->query($sql)===TRUE){
+                echo "<script language='javascript'>alert('Permit Successfully Added!');window.location.href='database.php?db_id=$db_id';</script>";
+              }
+              
+        }else{
+              echo "<script language='javascript'>alert('Uh oh! You do not have a permit to assign users to this DB');window.location.href='database.php?db_id=$db_id';</script>";
+        }
+
+    }
+
+    if(isset($_GET['delete_Permit'])){
+      $permit_ID = $_GET['delete_Permit'];
+      $db_ID = $_GET['db_id'];
+
+      $isOkay = checkPermit('4',$db_ID,$conn);
+
+      if($isOkay==TRUE){ 
+        $sql = "DELETE FROM permits WHERE permit_ID = $permit_ID";
+              if($conn->query($sql)===TRUE){
+                       echo "<script language='javascript'>alert('A permit has been deleted');window.location.href='database.php?db_id=$db_ID';</script>";
+              }
+      }else{
+        echo "<script language='javascript'>alert('Uh oh! You are not authorized to delete from permit list');window.location.href='database.php?db_id=$db_ID';</script>";
+      }
+    }
 
 
-          function checkPermit($operation,$db_ID){
-            include "ConnectDB.php";
+          function checkPermit($operation,$db_ID,$conn){
                     $isOkay = FALSE;
 
                     if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
@@ -607,17 +725,24 @@
 
 ?>
 
-<!--HELLO I AM BIG FEAR!!!!! this is where I got stuck!-->
+      <!--HELLO I AM BIG FEAR!!!!! this is where I got stuck!-->
 
 
 
 
 
-   <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  
+      <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+      </script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+      </script>
+
 </body>
+
 </html>

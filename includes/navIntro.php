@@ -10,7 +10,7 @@
         </li>
 
         <li class="nav-item">
-          <a href="./register.php" class="nav-link">Sign-Up</a>
+          <a href="./register.php" class="nav-link">Register</a>
         </li>
 <!-- 
         <li class="nav-item">

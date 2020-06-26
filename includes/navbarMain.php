@@ -31,10 +31,11 @@
                     echo '<li class="nav-item"><a class="nav-link" >No databases yet</a></li>';
                 }   
     ?>
-            <li class="nav-item">
-           <a href="?logout=true" class="nav-link text-light">Logout</a>
-        </li>
- 
+
     </ul>
+    <span class="navbar-text">
+      <b>Signed in as:</b> <?php echo $_SESSION['Succeed']['username']; ?>
+      <a href="?logout=true" class="text-danger ml-5">Logout</a>
+    </span>
   </div>
 </nav>

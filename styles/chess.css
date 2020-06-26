@@ -1,4 +1,4 @@
-td {
+/* td {
   height: 100px;
   width: 100px;
   border: 1px solid #333;
@@ -7,7 +7,7 @@ td {
 tr:nth-child(odd) td:nth-child(even),
 tr:nth-child(even) td:nth-child(odd) {
   background: black;
-}
+} */
 
 label.required::after {
   color: rgb(218, 36, 36);
@@ -17,4 +17,41 @@ label.required::after {
 label.hidden {
   color: transparent;
   user-select: none;
+}
+
+.modal.fade {
+  transition: all 200ms ease-in-out;
+}
+
+.modal.fade.show {
+  background: rgba(0,0,0,.5);
+}
+
+#login .invalid-feedback {
+  display: block;
+}
+
+.dropdown-toggle[id*="tableSettings"]::after {
+  display: none;
+}
+
+.accordion>.card {
+  overflow: visible;
+}
+
+[id*="tableSettings"]~.dropdown-menu {
+  padding: 0px;
+}
+
+[id*="tableSettings"]~.dropdown-menu .dropdown-item {
+  padding: .5rem 1.5rem;
+}
+
+[id*="tableSettings"]~.dropdown-menu .dropdown-item:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+[id*="tableSettings"]~.dropdown-menu .dropdown-item.alert-danger:hover {
+  background-color: var(--danger);
 }
