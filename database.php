@@ -562,15 +562,15 @@
 
 
           function checkPermit($operation,$db_ID){
+            include "ConnectDB.php";
                     $isOkay = FALSE;
 
                     if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
                         $isOkay = TRUE;
                     }else{
-
                         $username = $_SESSION['Succeed'];
                         $sql = "SELECT * FROM users WHERE username ='$username'";
-                       
+
                         $result = $conn->query($sql);
                         if($result->num_rows>0){
                           $row = $result->fetch_assoc();
