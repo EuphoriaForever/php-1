@@ -168,7 +168,7 @@
       } else {
 
         # create PK
-        $createPK = $conn->query("INSERT INTO attributes(attr_Name,datatype,limitation,isPrimary,isAutoinc,`isNull`,isParent,ParentOf,isFK,FK_of,tb_ID) VALUES('ID','INT',10,1,1,0,0,0,0,0,$tb)");
+        $createPK = $conn->query("INSERT INTO attributes(attr_Name,colNum,datatype,limitation,isPrimary,isAutoinc,`isNull`,isFK,tb_ID) VALUES('ID',1,'INT',10,1,1,0,0,$tb)");
 
         if(!$createPK) {
           addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
@@ -192,6 +192,8 @@
     $null = isset($_POST['isNull']) ? 1 : 0;
     $fk = isset($_POST['isFK']) ? 1 : 0;
     $fkOf = $_POST['FK_of'];
+    $tb = $_POST['table_ID'];
+    $pos = $_POST['position'];
 
     if($fk===1 && $fkOf===0) {
       addAlert("You need to link a foreign key to a table!", "danger");
@@ -200,7 +202,7 @@
     } else {
 
       # check if attribute already exists
-      $checkAttr = $conn->query("SELECT * FROM attributes WHERE attr_Name = $name");
+      $checkAttr = $conn->query("SELECT * FROM attributes WHERE attr_Name = '$name' AND tb_ID = $tb");
 
       if(!$checkAttr) {
         addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
@@ -209,22 +211,115 @@
           addAlert("An attribute with that name already exists.", "danger");
         } else {
 
-          # create if it doesn't
-          $createAttr = $conn->query("INSERT INTO attributes(attr_Name,datatype,limitation,isPrimary,isAutoInc,`isNull`,isParent,ParentOf,isFK,FK_of,tb_ID) VALUES('$name','$type',$limit,$pk,$autoInc,$null,$fk,$fkOd)");
+          #check if it's inserted in the middle, and move other columns accordingly
+          $checkCol = $conn->query("SELECT * FROM attributes WHERE colNum = $pos AND tb_ID = $tb");
 
-          if(!$createAttr) {
-            addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
-          } else if(fk===1) {
-            
-            # get the id of the insert entry
-            $insertID = $conn->insert_id;
+          if(!$checkCol) {
+            addAlert("<b>Uh oh!</b> Something went wrong. checkcol num ".$conn->error, "danger");
+          } else {
+            if($checkCol->num_rows > 0) {
 
-            # lets update the parent
-            
+              # get that column and everything after that
+              $moveCol = $conn->query("SELECT * FROM attributes WHERE colNum >= $pos AND tb_ID = $tb");
 
+              if(!$moveCol) {
+                addAlert("<b>Uh oh!</b> Something went wrong. movecol ".$conn->error, "danger");
+              } else {
+                while($colRow = $moveCol->fetch_assoc()) {
+
+                  # start moving
+                  $colID = $colRow['attr_ID'];
+                  $newPos = $colRow['colNum'] + 1;
+
+                  if(!$conn->query("UPDATE attributes SET colNum = $newPos WHERE attr_ID = $colID")) {
+                    addAlert("<b>Uh oh!</b> Something went wrong. updating colnum ".$conn->error, "danger");
+                  }
+                }
+
+                if(empty($_SESSION['alerts'])) {
+                  # create if it doesn't
+                  $createAttr = $conn->query("INSERT INTO attributes(attr_Name,colNum,datatype,limitation,isPrimary,isAutoInc,`isNull`,isFK,tb_ID) VALUES('$name',$pos,'$type',$limit,$pk,$autoInc,$null,$fk,$tb)");
+        
+                  if(!$createAttr) {
+                    addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
+                  } else if($fk===1) {
+                    
+                    # get the id of the insert entry
+                    $insertID = $conn->insert_id;
+        
+                    # lets create a new relationship (sana all)
+                    $createRel = $conn->query("INSERT INTO relationships(parent,child) VALUES($fkOf,$insertID)");
+        
+                    if($createRel) {
+                      addAlert("Successfully created attribute!", "success");
+                    } else {
+                      $conn->query("DELETE FROM attributes WHERE attr_ID = $insertID");
+                      addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
+                    }
+                  } else {
+                    addAlert("Successfully created attribute!", "success");
+                  }
+                }
+              }
+            }
           }
+
         }
       }
+    }
+  } else
+
+
+
+  # rename table
+  if (isset($_POST['editTB'])) {
+
+    # save inputs
+    $name = $_POST['rename'];
+    $tb = $_POST['tb_id'];
+
+    if(strcmp($name, str_replace(' ', '', $name)) !== 0) {
+      addAlert("<b>Uh oh!</b> Table name can't have spaces.", "danger");
+    } else {
+
+      $checkDuplicate = $conn->query("SELECT * FROM tb where tb_Name = '$name'");
+
+      if(!$checkDuplicate) {
+        addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
+      } else {
+        
+        if($checkDuplicate->num_rows > 0) {
+          addAlert("<b>Uh oh!</b> There already exists a table with that name.", "danger");
+        } else {
+          
+          $renameTB = $conn->query("UPDATE tb SET tb_Name = '$name' WHERE tb_ID = $tb");
+      
+          if(!$renameTB) {
+            addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
+          } else {
+            addAlert("Successfully renamed table!", "success");
+          }
+        }
+
+      }
+    }
+
+  } else
+
+
+
+  # delete table
+  if(isset($_GET['deleteTB'])) {
+
+    # save input
+    $tb = $_GET['id'];
+
+    $deleteTable = $conn->query("DELETE FROM tb WHERE tb_ID = $tb");
+
+    if(!deleteTable) {
+      addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
+    } else {
+      addAlert("Successfully delete table!", "success");
     }
   }
 
