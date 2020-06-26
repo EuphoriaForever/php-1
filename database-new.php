@@ -267,16 +267,16 @@
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="tableSettings-<?php echo $ind; ?>">
 
                       <?php if(isAllowed(1)) { ?>
-                        <a href="database.php?pk=1&tb_id=<?php echo $tb['id']; ?>&db_id=<?php echo $db_id; ?>" class="dropdown-item">Create a Primary Key (ID)</a>
+                        <a href="databaseMethods.php?pk=true&tb_id=<?php echo $tb['id']; ?>&db_id=<?php echo $db_id; ?>" class="dropdown-item">Create a Primary Key (ID)</a>
                         <button type="button" class="dropdown-item" data-toggle="modal" data-target="#createAttr-<?php echo $ind; ?>">Create Attribute</button>
                       <?php } ?>
 
                       <?php if(isAllowed(3)) { ?>
-                        <a href="editTB.php?id=<?php echo $tb['id']; ?>" class="dropdown-item">Edit Table</a>
+                        <a href="databaseMethods.php?id=<?php echo $tb['id']; ?>" class="dropdown-item">Edit Table</a>
                       <?php } ?>
 
                       <?php if(isAllowed(4)) { ?>
-                        <a href="deleteTable.php?id=<?php echo $tb['id']; ?>" class="dropdown-item alert-danger border-top">Delete Table</a>
+                        <a href="databaseMethods.php?id=<?php echo $tb['id']; ?>" class="dropdown-item alert-danger border-top">Delete Table</a>
                       <?php } ?>
                     </div>
                   </div>
@@ -306,6 +306,10 @@
                       </tbody>
                     <?php } ?>
                   </table>
+                <?php } ?>
+
+                <?php if(empty($tb['headers'])) { ?>
+                  <p>This table is empty.</p>
                 <?php } ?>
               </div>
             </div>
@@ -430,7 +434,7 @@
             </button>
           </div>
 
-          <form action="database.php" method="post" enctype="multipart/form-data">
+          <form action="databaseMethods.php" method="post" enctype="multipart/form-data">
             <div class="modal-body">
               <div class="form-row">
                 <div class="form-group col-12">
@@ -464,7 +468,7 @@
             </button>
           </div>
 
-          <form action="editDB-new.php" method="post">
+          <form action="databaseMethods.php" method="post">
             <div class="modal-body">
               <div class="form-row">
                 <div class="form-group col-12">
@@ -561,7 +565,7 @@
                         <?php } ?>
 
                         <?php if(isAllowed(4)) { ?>
-                          <a href="clearPerms.php?clearPerms=true&user=<?php echo $info['id'] ?>&db_id=<?php echo $db_id; ?>" class="btn btn-danger">
+                          <a href="databaseMethods.php?clearPerms=true&user=<?php echo $info['id'] ?>&db_id=<?php echo $db_id; ?>" class="btn btn-danger">
                             <i class="fa fa-trash mr-1"></i> Clear Permissions
                           </a>
                         <?php } ?>
@@ -589,7 +593,7 @@
             </button>
           </div>
 
-          <form action="addPermission.php" method="post">
+          <form action="databaseMethods.php" method="post">
             <div class="modal-body">
               <div class="form-row">
                 <div class="form-group col-6">
@@ -662,7 +666,7 @@
                 </button>
               </div>
 
-              <form action="editPermissions.php" method="post">
+              <form action="databaseMethods.php" method="post">
                 <div class="modal-body">
                   <div class="form-group">
                     <div class="custom-control custom-switch custom-control-inline">

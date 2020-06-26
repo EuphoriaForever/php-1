@@ -1,5 +1,7 @@
 <?php
+  session_start();
   include "connectDB.php";
+  include "checkLogin.php";
 
   if(isset($_GET['delete_id'])) {
     $deleteDB = $_GET['delete_id'];
