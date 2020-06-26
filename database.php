@@ -292,12 +292,13 @@
                           <div id="collapse'.$num.'" class="collapse" aria-labelledby="heading'.$num.'" data-parent="#accordionExample">
                           <div class="card-body">
                             <a class="btn btn-danger" href="database.php?del_tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Delete Table</a>
-                            <a class="btn btn-info" href="editTB.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Edit Table</a>
                             <a class="btn btn-success" href="database.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Create a Primary Key (ID)</a>
+                            <a class="btn btn-info" href="editTB.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Edit Table</a>
+                            <a class="btn btn-success" href="addRow.php?tb_ID='.$row2['tb_ID'].'&db_id='.$db_id.'">Add to Rows</a>
                             
                             <button type="button" class="btn btn-success " data-toggle="modal" data-target="#exampleModal'.$num.'">
                                  Create an Attribute
-                             </button>
+                            </button>
                              ';
                               /// PHP CODE TO DISPLAY THE TABLE HERE
                               $sql = "SELECT * FROM attributes WHERE tb_ID=".$row2['tb_ID'];
@@ -326,10 +327,14 @@
                                   do{
                                     echo "<tr>";
                                     for($ctr=0; $ctr<count($attributeArray); $ctr++){
-                                      $sql = "SELECT * FROM `rows` WHERE `rowNum`=1 AND `attr_ID`=".$attributeArray[$ctr]['attr_ID'];
+                                      $sql = "SELECT * FROM `rows` WHERE `rowNum`=$rowNum AND `attr_ID`=".$attributeArray[$ctr]['attr_ID'];
                                       $cell = $conn->query($sql);
-                                      $value = $cell->fetch_assoc();
-                                      echo "<td>".$value['value']."</td>";
+                                      if($cell!=null && $cell->num_rows>0){
+                                        $value = $cell->fetch_assoc();
+                                        echo "<td>".$value['value']."</td>";
+                                      } else {
+                                        echo "<td><i>emptyfield草</i></td>";
+                                      }
                                     }
                                     echo "</tr>";
                                     // check if the next row num exists
@@ -339,7 +344,7 @@
                                   }while($check!=null && $check->num_rows>0);
                                   echo "</table>";
                                 } else {
-                                  // table is empty
+                                  // table is empty because there is no first row primary key
                                 }
                               } else {
                                 // attribute list is empty
