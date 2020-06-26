@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 26, 2020 at 05:12 AM
+-- Generation Time: Jun 26, 2020 at 05:33 AM
 -- Server version: 10.4.8-MariaDB
 -- PHP Version: 7.3.11
 
@@ -48,7 +48,8 @@ INSERT INTO `attributes` (`attr_ID`, `attr_Name`, `datatype`, `limitation`, `isP
 (4, 'ID', 'INT', 10, 1, 1, 0, 0, 17),
 (5, 'ID', 'INT', 10, 1, 1, 0, 0, 18),
 (7, 'ID', 'INT', 10, 1, 1, 0, 0, 19),
-(10, 'Firstname', 'varchar', 255, 0, 0, 0, 0, 17);
+(10, 'Firstname', 'varchar', 255, 0, 0, 0, 0, 17),
+(18, 'Character_Name', 'STRING', 255, 0, 0, 0, 1, 18);
 
 -- --------------------------------------------------------
 
@@ -125,6 +126,13 @@ CREATE TABLE `relationships` (
   `parent` int(10) NOT NULL,
   `child` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `relationships`
+--
+
+INSERT INTO `relationships` (`rel_ID`, `parent`, `child`) VALUES
+(0, 4, 18);
 
 -- --------------------------------------------------------
 
@@ -227,6 +235,14 @@ ALTER TABLE `permits`
   ADD KEY `user_ID` (`user_ID`);
 
 --
+-- Indexes for table `relationships`
+--
+ALTER TABLE `relationships`
+  ADD PRIMARY KEY (`rel_ID`),
+  ADD KEY `child` (`child`),
+  ADD KEY `parent` (`parent`);
+
+--
 -- Indexes for table `rows`
 --
 ALTER TABLE `rows`
@@ -254,7 +270,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `attributes`
 --
 ALTER TABLE `attributes`
-  MODIFY `attr_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `attr_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `db`
@@ -315,6 +331,13 @@ ALTER TABLE `permits`
   ADD CONSTRAINT `permits_ibfk_1` FOREIGN KEY (`db`) REFERENCES `db` (`db_ID`) ON DELETE CASCADE,
   ADD CONSTRAINT `permits_ibfk_2` FOREIGN KEY (`operation`) REFERENCES `operations` (`op_ID`) ON DELETE CASCADE,
   ADD CONSTRAINT `permits_ibfk_3` FOREIGN KEY (`user_ID`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `relationships`
+--
+ALTER TABLE `relationships`
+  ADD CONSTRAINT `relationships_ibfk_1` FOREIGN KEY (`child`) REFERENCES `attributes` (`attr_ID`),
+  ADD CONSTRAINT `relationships_ibfk_2` FOREIGN KEY (`parent`) REFERENCES `attributes` (`attr_ID`);
 
 --
 -- Constraints for table `rows`
