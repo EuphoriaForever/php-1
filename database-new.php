@@ -88,16 +88,19 @@
           );
 
           # lets get the headers
-          $getHeaders = $conn->query("SELECT * FROM attributes WHERE tb_ID = ".$pushTable['id']);
+          $getHeaders = $conn->query("SELECT * FROM attributes WHERE tb_ID = ".$pushTable['id']." ORDER BY colNum ASC");
 
           if($getHeaders) {
             if($getHeaders->num_rows > 0) {
 
+              $pushTable['headerCount'] = $getHeaders->num_rows;
+
               # save to headers array and add values in the column
               while($header = $getHeaders->fetch_assoc()) {
-                array_push($pushTable['headers'], $header['attr_Name']);
+                array_push($pushTable['headers'], array('name' => $header['attr_Name'], 'colNum' => $header['colNum'], 'id' => $header['attr_ID']));
 
                 if($header['isPrimary']) {
+                  $pushTable['pk'] = $header['attr_ID'];
                   array_push($primaries, $pushTable);
                 }
                 # look for rows and save to corresponding index
@@ -113,15 +116,16 @@
                       $rowNum = $tbRow['rowNum'];
                       $val = $tbRow['value'];
                       $rowID = $tbRow['row_ID'];
+                      $rowColId = $tbRow['attr_ID'];
 
                       if(!isset($pushTable['rows'][$rowNum])) {
                         $pushTable['rows'][$rowNum] = array();
                       }
                       
-                      array_push($pushTable['rows'][$rowNum], array(
+                      $pushTable['rows'][$rowNum][$rowColId] = array(
                         'value' => $val,
-                        'id' => $rowID
-                      ));
+                        'id' => $rowID,
+                      );
                     }
                   }
                 } else {
@@ -174,7 +178,7 @@
             $checkPerms = $conn->query("SELECT * FROM permits WHERE db = $db_id AND user_ID = $userID");
 
 
-            if($checkPerms->num_rows === 4) { # if they have 4 permissions on the database (meaning complete crud), save them under "all access"
+            if($checkPerms->num_rows === 3) { # if they have 4 permissions on the database (meaning complete crud), save them under "all access"
               $permitted[$user]['perms'] = array("All Access");
             } else if ($checkPerms->num_rows > 0) {
 
@@ -258,29 +262,39 @@
               <h2 class="mb-0 row justify-content-between">
                 <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-<?php echo $ind; ?>" aria-expanded="false" aria-controls="collapse-<?php echo $ind; ?>"><?php echo $tb['name']; ?></button>
 
-                <?php if(!empty($permissions)) { ?>
-                  <div class="dropdown">
-                    <button class="btn dropdown-toggle btn-outline-dark border-0" type="button" id="tableSettings-<?php echo $ind; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="fa fa-cog"></i>
+                <div class="row justify-content-end pr-3">
+                  <?php if(isAllowed(1)) { ?>
+                    <button type="button" data-toggle="modal" data-target="#addValues-<?php echo $ind; ?>" class="btn btn-success">
+                      <i class="fa fa-plus mr-1"></i>
+                      Insert Values
                     </button>
-  
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="tableSettings-<?php echo $ind; ?>">
+                  <?php } ?>
 
-                      <?php if(isAllowed(1)) { ?>
-                        <a href="database.php?pk=1&tb_id=<?php echo $tb['id']; ?>&db_id=<?php echo $db_id; ?>" class="dropdown-item">Create a Primary Key (ID)</a>
-                        <button type="button" class="dropdown-item" data-toggle="modal" data-target="#createAttr-<?php echo $ind; ?>">Create Attribute</button>
-                      <?php } ?>
+                  <?php if(!empty($permissions)) { ?>
+                    <div class="dropdown ml-3">
+                      <button class="btn dropdown-toggle btn-outline-dark border-0" type="button" id="tableSettings-<?php echo $ind; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-cog"></i>
+                      </button>
+    
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="tableSettings-<?php echo $ind; ?>">
 
-                      <?php if(isAllowed(3)) { ?>
-                        <a href="editTB.php?id=<?php echo $tb['id']; ?>" class="dropdown-item">Edit Table</a>
-                      <?php } ?>
+                        <?php if(isAllowed(1)) { ?>
+                          <a href="databaseMethods.php?pk=true&tb_id=<?php echo $tb['id']; ?>&db_id=<?php echo $db_id; ?>" class="dropdown-item">Create a Primary Key (ID)</a>
 
-                      <?php if(isAllowed(4)) { ?>
-                        <a href="deleteTable.php?id=<?php echo $tb['id']; ?>" class="dropdown-item alert-danger border-top">Delete Table</a>
-                      <?php } ?>
+                          <button type="button" class="dropdown-item" data-toggle="modal" data-target="#createAttr-<?php echo $ind; ?>">Create Attribute</button>
+                        <?php } ?>
+
+                        <?php if(isAllowed(3)) { ?>
+                          <button type="button" data-toggle="modal" data-target="#editTB-<?php echo $ind; ?>" class="dropdown-item">Edit Table</button>
+                        <?php } ?>
+
+                        <?php if(isAllowed(4)) { ?>
+                          <a href="databaseMethods.php?deleteTB=true&id=<?php echo $tb['id']; ?>" class="dropdown-item alert-danger border-top">Delete Table</a>
+                        <?php } ?>
+                      </div>
                     </div>
-                  </div>
-                <?php } ?>
+                  <?php } ?>
+                </div>
 
               </h2>
             </div>
@@ -291,21 +305,31 @@
                   <table class="table table-striped">
                     <thead class="thead-dark">
                       <?php foreach($tb['headers'] as $head) { ?>
-                        <th scope="col"><?php echo $head; ?></th>
+                        <th scope="col"><?php echo $head['name']; ?></th>
                       <?php } ?>
                     </thead>
                     <?php if(!empty($tb['rows'])) { ?>
                       <tbody>
                         <?php foreach ($tb['rows'] as $rowArr) {?>
                           <tr>
-                            <?php foreach ($rowArr as $theRow => $rowInfo) { ?>
-                              <td><?php echo $rowInfo['value']; ?></td>
+                            <?php foreach ($tb['headers'] as $head) { ?>
+                              <td>
+                                <?php 
+                                  $headerID = $head['id'];
+
+                                  echo isset($rowArr[$headerID]) ? $rowArr[$headerID]['value'] : '<i>Null</i>';
+                                ?>
+                              </td>
                             <?php } ?>
                           </tr>
                         <?php } ?>
                       </tbody>
                     <?php } ?>
                   </table>
+                <?php } ?>
+
+                <?php if(empty($tb['headers'])) { ?>
+                  <p>This table is empty.</p>
                 <?php } ?>
               </div>
             </div>
@@ -324,7 +348,7 @@
                   </button>
                 </div>
 
-                <form action="database.php" method="post" enctype="multipart/form-data">
+                <form action="databaseMethods.php" method="post" enctype="multipart/form-data">
                   <div class="modal-body">
                     <div class="form-row">
                       <div class="form-group col-md-6 col-sm-12">
@@ -374,7 +398,7 @@
                       <div class="form-group col-md-6 col-sm-12">
                         <label for="FK_of-<?php echo $ind; ?>">Choose a Table</label>
                         <select name="FK_of" id="FK_of-<?php echo $ind; ?>" class="form-control" disabled>
-                          <option selected value="0" style="display: none">Choose</option>
+                          <option selected value="-1" style="display: none">Choose</option>
                           <!-- loop through our primaries collection and display the tables -->
                           <?php
 
@@ -384,7 +408,7 @@
                             foreach($primaries as $pkTB) {
                               if($pkTB['id'] !== $tb['id']) {
                                 $count++;
-                                echo '<option value="'.$pkTB['id'].'">'.$pkTB['name'].'</option>';
+                                echo '<option value="'.$pkTB['pk'].'">'.$pkTB['name'].'</option>';
                               }
                             }
                             
@@ -393,7 +417,25 @@
                             }
                           ?>
                         </select>
+
+                        <input type="hidden" name="table_ID" value="<?php echo $tb['id']; ?>">
                       </div>
+                      
+                      <?php if(!empty($tb['headers'])) { ?>
+                        <div class="form-group col-12">
+                          <label for="position-<?php echo $ind; ?>">Insert...</label>
+                          <select name="position" id="position-<?php echo $ind; ?>" class="form-control">
+                            <option value="1">at the beginning of table</option>
+                            <?php foreach($tb['headers'] as $headerInfo) { ?>
+                              <option value="<?php echo $headerInfo['colNum']+1; ?>">after <?php echo $headerInfo['name']; ?></option>
+                            <?php } ?>
+                          </select>
+                        </div>
+                      <?php } ?>
+
+                      <?php if(empty($tb['headers'])) { ?>
+                        <input type="hidden" name="position" value="1">
+                      <?php } ?>
                     </div>
                   </div>
 
@@ -406,6 +448,52 @@
             </div>
           </div>
           <!-- corresponding attribute modal EOC -->
+
+
+          <!-- corresponding edit table modal BOC -->
+          <div class="modal fade" id="editTB-<?php echo $ind; ?>" role="dialog" tabindex="-1" aria-labelledby="editTBHeader-<?php echo $ind; ?>" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editTBHeader-<?php echo $ind; ?>">Edit Table</h5>
+                  
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+
+                <form action="databaseMethods.php" method="post">
+                  <div class="modal-body">
+                    <div class="form-row">
+                      <div class="form-group col-12">
+                        <label for="rename">Rename Table</label>
+                        <input type="text" name="rename" id="rename" class="form-control" required="required" placeholder="Enter new table name">
+                      </div>
+                    </div>
+
+                    <input type="hidden" name="tb_id" value="<?php echo $tb['id']; ?>">
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" name="editTB">Edit Table</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- corresponding edit table modal EOC -->
+
+
+          <!-- corresponding add values modal BOC -->
+          <div class="modal fade" role="dialog" id="addValues-<?php echo $ind; ?>" tabindex="-1" aria-labelledby="addValuesHeader-<?php echo $ind; ?>" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                
+              </div>
+            </div>
+          </div>
+          <!-- corresponding add values modal EOC -->
         <?php } } else { ?>
           <h6 class="text-center">There are no tables in this database yet.</h6>
         <?php } ?>
@@ -430,7 +518,7 @@
             </button>
           </div>
 
-          <form action="database.php" method="post" enctype="multipart/form-data">
+          <form action="databaseMethods.php" method="post" enctype="multipart/form-data">
             <div class="modal-body">
               <div class="form-row">
                 <div class="form-group col-12">
@@ -453,18 +541,18 @@
     <!-- create new table modal EOC -->
 
     <!-- edit database modal BOC -->
-    <div class="modal fade" id="editDB" role="dialog" tabindex="-1" aria-labelledby="editTBHeader" aria-hidden="true">
+    <div class="modal fade" id="editDB" role="dialog" tabindex="-1" aria-labelledby="editDBHeader" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="editTBHeader">Edit Database</h5>
+            <h5 class="modal-title" id="editDBHeader">Edit Database</h5>
             
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
 
-          <form action="editDB-new.php" method="post">
+          <form action="databaseMethods.php" method="post">
             <div class="modal-body">
               <div class="form-row">
                 <div class="form-group col-12">
@@ -561,7 +649,7 @@
                         <?php } ?>
 
                         <?php if(isAllowed(4)) { ?>
-                          <a href="clearPerms.php?clearPerms=true&user=<?php echo $info['id'] ?>&db_id=<?php echo $db_id; ?>" class="btn btn-danger">
+                          <a href="databaseMethods.php?clearPerms=true&user=<?php echo $info['id'] ?>&db_id=<?php echo $db_id; ?>" class="btn btn-danger">
                             <i class="fa fa-trash mr-1"></i> Clear Permissions
                           </a>
                         <?php } ?>
@@ -589,7 +677,7 @@
             </button>
           </div>
 
-          <form action="addPermission.php" method="post">
+          <form action="databaseMethods.php" method="post">
             <div class="modal-body">
               <div class="form-row">
                 <div class="form-group col-6">
@@ -614,18 +702,14 @@
                         <label class="custom-control-label" for="create">Create</label>
                       </div>
 
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" name="permissions[]" id="read" class="custom-control-input" value="2">
-                        <label for="read" class="custom-control-label">Read</label>
-                      </div>
-                    </div>
-
-                    <div class="col-6">
+                      
                       <div class="custom-control custom-switch">
                         <input type="checkbox" name="permissions[]" id="update" class="custom-control-input" value="3">
                         <label for="update" class="custom-control-label">Update</label>
                       </div>
+                    </div>
 
+                    <div class="col-6">
                       <div class="custom-control custom-switch">
                         <input type="checkbox" name="permissions[]" id="delete" class="custom-control-input" value="4">
                         <label for="delete" class="custom-control-label">Delete</label>
@@ -633,6 +717,7 @@
 
                       <input type="hidden" name="db_id" value="<?php echo $db_id; ?>">
                     </div>
+
                   </div>
                 </div>
               </div>
@@ -662,7 +747,7 @@
                 </button>
               </div>
 
-              <form action="editPermissions.php" method="post">
+              <form action="databaseMethods.php" method="post">
                 <div class="modal-body">
                   <div class="form-group">
                     <div class="custom-control custom-switch custom-control-inline">
@@ -670,13 +755,6 @@
                       <?php if(in_array('Create', $info['perms']) || in_array("All Access", $info['perms'])) { echo 'checked'; }?>
                       >
                       <label class="custom-control-label" for="create-<?php echo $info['id']; ?>">Create</label>
-                    </div>
-
-                    <div class="custom-control custom-switch custom-control-inline">
-                      <input type="checkbox" name="permissions[]" id="read-<?php echo $info['id']; ?>" class="custom-control-input" value="2"
-                      <?php if(in_array('Read', $info['perms']) || in_array("All Access", $info['perms'])) { echo 'checked'; }?>
-                      >
-                      <label for="read-<?php echo $info['id']; ?>" class="custom-control-label">Read</label>
                     </div>
 
                     <div class="custom-control custom-switch custom-control-inline">

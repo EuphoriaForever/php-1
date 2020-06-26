@@ -64,7 +64,7 @@
         # if query successful, add alert to be printed in login page and redirect, otherwise, flag an alert error on this page
         if($conn->query($register) === TRUE) {
           addAlert("Account successfully made! Please login below.", "success");
-          header("Location: login-new.php");
+          header("Location: login.php");
         } else {
           addAlert("<b>Uh oh!</b> Something went wrong! ".$conn->error, "danger");
         }

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.1
+-- version 4.9.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 24, 2020 at 03:13 PM
--- Server version: 10.4.11-MariaDB
--- PHP Version: 7.4.1
+-- Generation Time: Jun 26, 2020 at 05:33 AM
+-- Server version: 10.4.8-MariaDB
+-- PHP Version: 7.3.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -36,10 +36,7 @@ CREATE TABLE `attributes` (
   `isPrimary` tinyint(1) NOT NULL,
   `isAutoInc` tinyint(1) NOT NULL,
   `isNull` tinyint(1) NOT NULL,
-  `isParent` tinyint(1) NOT NULL,
-  `ParentOf` int(10) DEFAULT NULL,
   `isFK` tinyint(1) NOT NULL,
-  `FK_of` int(10) NOT NULL,
   `tb_ID` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -47,12 +44,12 @@ CREATE TABLE `attributes` (
 -- Dumping data for table `attributes`
 --
 
-INSERT INTO `attributes` (`attr_ID`, `attr_Name`, `datatype`, `limitation`, `isPrimary`, `isAutoInc`, `isNull`, `isParent`, `ParentOf`, `isFK`, `FK_of`, `tb_ID`) VALUES
-(4, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 17),
-(5, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 18),
-(7, 'ID', 'INT', 10, 1, 1, 0, 0, 0, 0, 0, 19),
-(9, 'Character_Owner', 'INT', 10, 0, 0, 0, 0, 0, 1, 17, 18),
-(10, 'Firstname', 'varchar', 255, 0, 0, 0, 0, 0, 0, 0, 17);
+INSERT INTO `attributes` (`attr_ID`, `attr_Name`, `datatype`, `limitation`, `isPrimary`, `isAutoInc`, `isNull`, `isFK`, `tb_ID`) VALUES
+(4, 'ID', 'INT', 10, 1, 1, 0, 0, 17),
+(5, 'ID', 'INT', 10, 1, 1, 0, 0, 18),
+(7, 'ID', 'INT', 10, 1, 1, 0, 0, 19),
+(10, 'Firstname', 'varchar', 255, 0, 0, 0, 0, 17),
+(18, 'Character_Name', 'STRING', 255, 0, 0, 0, 1, 18);
 
 -- --------------------------------------------------------
 
@@ -108,6 +105,35 @@ CREATE TABLE `permits` (
   `db` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `permits`
+--
+
+INSERT INTO `permits` (`permit_ID`, `operation`, `user_ID`, `db`) VALUES
+(45, 1, 9, 9),
+(46, 2, 9, 9),
+(47, 3, 9, 9),
+(48, 4, 9, 9);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `relationships`
+--
+
+CREATE TABLE `relationships` (
+  `rel_ID` int(10) NOT NULL,
+  `parent` int(10) NOT NULL,
+  `child` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `relationships`
+--
+
+INSERT INTO `relationships` (`rel_ID`, `parent`, `child`) VALUES
+(0, 4, 18);
+
 -- --------------------------------------------------------
 
 --
@@ -118,7 +144,7 @@ CREATE TABLE `rows` (
   `row_ID` int(10) NOT NULL,
   `rowNum` int(10) NOT NULL,
   `attr_ID` int(10) NOT NULL,
-  `value` varchar(255) NOT NULL
+  `value` longtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -172,7 +198,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `username`, `password`, `type`) VALUES
 (1, 'admin', 'adminadmin', 'administrator'),
 (2, 'Kweenisma', 'Kweenisma18100432', 'user'),
-(3, 'DerekYu565', 'yeetyeetskrrt', 'user');
+(3, 'DerekYu565', 'yeetyeetskrrt', 'user'),
+(9, 'ellexide', 'Tagupa0690', 'user');
 
 --
 -- Indexes for dumped tables
@@ -208,6 +235,14 @@ ALTER TABLE `permits`
   ADD KEY `user_ID` (`user_ID`);
 
 --
+-- Indexes for table `relationships`
+--
+ALTER TABLE `relationships`
+  ADD PRIMARY KEY (`rel_ID`),
+  ADD KEY `child` (`child`),
+  ADD KEY `parent` (`parent`);
+
+--
 -- Indexes for table `rows`
 --
 ALTER TABLE `rows`
@@ -235,13 +270,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `attributes`
 --
 ALTER TABLE `attributes`
-  MODIFY `attr_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `attr_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `db`
 --
 ALTER TABLE `db`
-  MODIFY `db_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `db_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `operations`
@@ -253,7 +288,7 @@ ALTER TABLE `operations`
 -- AUTO_INCREMENT for table `permits`
 --
 ALTER TABLE `permits`
-  MODIFY `permit_ID` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `permit_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `rows`
@@ -265,13 +300,13 @@ ALTER TABLE `rows`
 -- AUTO_INCREMENT for table `tb`
 --
 ALTER TABLE `tb`
-  MODIFY `tb_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `tb_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `user_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables
@@ -296,6 +331,13 @@ ALTER TABLE `permits`
   ADD CONSTRAINT `permits_ibfk_1` FOREIGN KEY (`db`) REFERENCES `db` (`db_ID`) ON DELETE CASCADE,
   ADD CONSTRAINT `permits_ibfk_2` FOREIGN KEY (`operation`) REFERENCES `operations` (`op_ID`) ON DELETE CASCADE,
   ADD CONSTRAINT `permits_ibfk_3` FOREIGN KEY (`user_ID`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `relationships`
+--
+ALTER TABLE `relationships`
+  ADD CONSTRAINT `relationships_ibfk_1` FOREIGN KEY (`child`) REFERENCES `attributes` (`attr_ID`),
+  ADD CONSTRAINT `relationships_ibfk_2` FOREIGN KEY (`parent`) REFERENCES `attributes` (`attr_ID`);
 
 --
 -- Constraints for table `rows`
