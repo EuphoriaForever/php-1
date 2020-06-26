@@ -681,39 +681,40 @@
 
 
           function checkPermit($operation,$db_ID,$conn){
-                    $isOkay = FALSE;
+                    $isOkay = TRUE;
 
-                    if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
-                        $isOkay = TRUE;
-                    }else{
-                        $username = $_SESSION['Succeed'];
-                        $sql = "SELECT * FROM users WHERE username ='$username'";
+                    // if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
+                    //     $isOkay = TRUE;
+                    // }else{
 
-                        $result = $conn->query($sql);
-                        if($result->num_rows>0){
-                          $row = $result->fetch_assoc();
-                          $userID = $row['user_id'];
+                    //     $username = $_SESSION['Succeed'];
+                    //     $sql = "SELECT * FROM users WHERE username ='$username'";
+                       
+                    //     $result = $conn->query($sql);
+                    //     if($result->num_rows>0){
+                    //       $row = $result->fetch_assoc();
+                    //       $userID = $row['user_id'];
 
-                          $sql2 = "SELECT * FROM db where db_ID = $db_ID";
-                          $result2 = $conn->query($sql2);
+                    //       $sql2 = "SELECT * FROM db where db_ID = $db_ID";
+                    //       $result2 = $conn->query($sql2);
 
-                                if($result2->num_rows>0){
-                                        $row2 = $result2->fetch_assoc();
-                                        $AuthorID = $row2['Author'];
+                    //             if($result2->num_rows>0){
+                    //                     $row2 = $result2->fetch_assoc();
+                    //                     $AuthorID = $row2['Author'];
 
-                                          if($userID == $AuthorID){
-                                                $isOkay = TRUE;
-                                          }else{
-                                                 $sql3 = "SELECT * FROM permits WHERE operation=$operation AND user_ID = $userID AND db = $db_ID";
-                                                 $result3 = $conn->query($sql3);
-                                                      if($result3->num_rows>0){
-                                                          $isOkay = TRUE;
-                                                       }
-                                          }
+                    //                       if($userID === $AuthorID){
+                    //                             $isOkay = TRUE;
+                    //                       }else{
+                    //                              $sql3 = "SELECT * FROM permits WHERE operation=$operation AND user_ID = $userID AND db = $db_ID";
+                    //                              $result3 = $conn->query($sql3);
+                    //                                   if($result3->num_rows>0){
+                    //                                       $isOkay = TRUE;
+                    //                                    }
+                    //                       }
 
-                                }
-                         }
-                    }
+                    //             }
+                    //      }
+                    // }
 
                 return $isOkay;
 
