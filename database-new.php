@@ -220,6 +220,17 @@
           $allUsers[$thisUser['user_id']] = $thisUser['username'];
         }
       }
+
+      # get all datatypes 
+      $datatypes = array();
+
+      $getDatatypes = $conn->query("SELECT * FROM datatypes");
+
+      if($getDatatypes->num_rows > 0) {
+        while($foundType = $getDatatypes->fetch_assoc()) {
+          $datatypes[$foundType['data_ID']] = $foundType['data_Name'];
+        }
+      }
     } else {
       header("Location: welcome.php");
     }
@@ -264,10 +275,10 @@
 
                 <div class="row justify-content-end pr-3">
                   <?php if(isAllowed(1)) { ?>
-                    <button type="button" data-toggle="modal" data-target="#addValues-<?php echo $ind; ?>" class="btn btn-success">
+                    <a href="addValues.php?tb_id=<?php echo $tb['id']; ?>" class="btn btn-success">
                       <i class="fa fa-plus mr-1"></i>
                       Insert Values
-                    </button>
+                    </a>
                   <?php } ?>
 
                   <?php if(!empty($permissions)) { ?>
@@ -358,7 +369,12 @@
 
                       <div class="form-group col-md-6 col-sm-12">
                         <label class="required" for="datatype-<?php echo $ind; ?>">Datatype</label>
-                        <input type="text" name="datatype" id="datattype-<?php echo $ind; ?>" class="form-control" placeholder="Enter Datatype" required>
+                        <select class="form-control" name="datatype" id="datatype-<?php echo $ind; ?>" required>
+                          <option value="-1" style="display: none" selected>Choose datatype...</option>
+                          <?php foreach($datatypes as $id => $val) { ?>
+                            <option value="<?php echo $id; ?>"><?php echo $val; ?></option>
+                          <?php } ?>
+                        </select>
                       </div>
                     </div>
 
@@ -426,8 +442,10 @@
                           <label for="position-<?php echo $ind; ?>">Insert...</label>
                           <select name="position" id="position-<?php echo $ind; ?>" class="form-control">
                             <option value="1">at the beginning of table</option>
-                            <?php foreach($tb['headers'] as $headerInfo) { ?>
-                              <option value="<?php echo $headerInfo['colNum']+1; ?>">after <?php echo $headerInfo['name']; ?></option>
+                            <?php foreach($tb['headers'] as $headNum => $headerInfo) { ?>
+                              <option 
+                              value="<?php echo $headerInfo['colNum']+1; ?>"
+                              <?php echo $headNum === $tb['headerCount'] - 1 ? 'selected' : ''; ?>>after <?php echo $headerInfo['name']; ?></option>
                             <?php } ?>
                           </select>
                         </div>
@@ -483,17 +501,6 @@
             </div>
           </div>
           <!-- corresponding edit table modal EOC -->
-
-
-          <!-- corresponding add values modal BOC -->
-          <div class="modal fade" role="dialog" id="addValues-<?php echo $ind; ?>" tabindex="-1" aria-labelledby="addValuesHeader-<?php echo $ind; ?>" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                
-              </div>
-            </div>
-          </div>
-          <!-- corresponding add values modal EOC -->
         <?php } } else { ?>
           <h6 class="text-center">There are no tables in this database yet.</h6>
         <?php } ?>

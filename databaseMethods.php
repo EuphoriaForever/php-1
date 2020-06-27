@@ -191,7 +191,7 @@
     $autoInc = isset($_POST['isAutoInc']) ? 1 : 0;
     $null = isset($_POST['isNull']) ? 1 : 0;
     $fk = isset($_POST['isFK']) ? 1 : 0;
-    $fkOf = $_POST['FK_of'];
+    $fkOf = isset($_POST['isFK']) ? $_POST['FK_of'] : 0;
     $tb = $_POST['table_ID'];
     $pos = $_POST['position'];
 
@@ -199,6 +199,8 @@
       addAlert("You need to link a foreign key to a table!", "danger");
     } else if(strcmp($name, str_replace(' ', '', $name)) !== 0) {
       addAlert("<b>Uh oh!</b> There must be no spaces in the attribute name.", "danger");
+    } else if ($type === -1) {
+      addAlert("Please select a datatype!", "danger");
     } else {
 
       # check if attribute already exists
@@ -236,30 +238,31 @@
                   }
                 }
 
-                if(empty($_SESSION['alerts'])) {
-                  # create if it doesn't
-                  $createAttr = $conn->query("INSERT INTO attributes(attr_Name,colNum,datatype,limitation,isPrimary,isAutoInc,`isNull`,isFK,tb_ID) VALUES('$name',$pos,'$type',$limit,$pk,$autoInc,$null,$fk,$tb)");
-        
-                  if(!$createAttr) {
-                    addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
-                  } else if($fk===1) {
-                    
-                    # get the id of the insert entry
-                    $insertID = $conn->insert_id;
-        
-                    # lets create a new relationship (sana all)
-                    $createRel = $conn->query("INSERT INTO relationships(parent,child) VALUES($fkOf,$insertID)");
-        
-                    if($createRel) {
-                      addAlert("Successfully created attribute!", "success");
-                    } else {
-                      $conn->query("DELETE FROM attributes WHERE attr_ID = $insertID");
-                      addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
-                    }
-                  } else {
-                    addAlert("Successfully created attribute!", "success");
-                  }
+              }
+            }
+            
+            if(empty($_SESSION['alerts'])) {
+              # create if it doesn't
+              $createAttr = $conn->query("INSERT INTO attributes(attr_Name,colNum,datatype,limitation,isPrimary,isAutoInc,`isNull`,isFK,tb_ID) VALUES('$name',$pos,'$type',$limit,$pk,$autoInc,$null,$fk,$tb)");
+    
+              if(!$createAttr) {
+                addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
+              } else if($fk===1) {
+                
+                # get the id of the insert entry
+                $insertID = $conn->insert_id;
+    
+                # lets create a new relationship (sana all)
+                $createRel = $conn->query("INSERT INTO relationships(parent,child) VALUES($fkOf,$insertID)");
+    
+                if($createRel) {
+                  addAlert("Successfully created attribute!", "success");
+                } else {
+                  $conn->query("DELETE FROM attributes WHERE attr_ID = $insertID");
+                  addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
                 }
+              } else {
+                addAlert("Successfully created attribute!", "success");
               }
             }
           }

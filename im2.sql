@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 26, 2020 at 05:33 AM
+-- Generation Time: Jun 27, 2020 at 08:50 AM
 -- Server version: 10.4.8-MariaDB
 -- PHP Version: 7.3.11
 
@@ -31,7 +31,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `attributes` (
   `attr_ID` int(10) NOT NULL,
   `attr_Name` varchar(255) NOT NULL,
-  `datatype` varchar(255) NOT NULL,
+  `colNum` int(10) NOT NULL,
+  `datatype` int(11) NOT NULL,
   `limitation` int(10) NOT NULL,
   `isPrimary` tinyint(1) NOT NULL,
   `isAutoInc` tinyint(1) NOT NULL,
@@ -44,12 +45,38 @@ CREATE TABLE `attributes` (
 -- Dumping data for table `attributes`
 --
 
-INSERT INTO `attributes` (`attr_ID`, `attr_Name`, `datatype`, `limitation`, `isPrimary`, `isAutoInc`, `isNull`, `isFK`, `tb_ID`) VALUES
-(4, 'ID', 'INT', 10, 1, 1, 0, 0, 17),
-(5, 'ID', 'INT', 10, 1, 1, 0, 0, 18),
-(7, 'ID', 'INT', 10, 1, 1, 0, 0, 19),
-(10, 'Firstname', 'varchar', 255, 0, 0, 0, 0, 17),
-(18, 'Character_Name', 'STRING', 255, 0, 0, 0, 1, 18);
+INSERT INTO `attributes` (`attr_ID`, `attr_Name`, `colNum`, `datatype`, `limitation`, `isPrimary`, `isAutoInc`, `isNull`, `isFK`, `tb_ID`) VALUES
+(4, 'ID', 1, 1, 10, 1, 1, 0, 0, 17),
+(5, 'ID', 1, 1, 10, 1, 1, 0, 0, 18),
+(7, 'ID', 1, 1, 10, 1, 1, 0, 0, 19),
+(10, 'Firstname', 4, 2, 255, 0, 0, 0, 0, 17),
+(18, 'Character_Name', 3, 2, 255, 0, 0, 0, 1, 18),
+(19, 'ID', 1, 1, 10, 1, 1, 0, 0, 28),
+(20, 'lastName', 2, 2, 255, 0, 0, 0, 0, 17),
+(21, 'middle_initial', 3, 2, 10, 0, 0, 0, 0, 17),
+(22, 'bossName', 2, 2, 255, 0, 0, 0, 0, 19),
+(23, 'stageNum', 2, 1, 10, 0, 0, 0, 0, 18);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `datatypes`
+--
+
+CREATE TABLE `datatypes` (
+  `data_ID` int(10) NOT NULL,
+  `data_Name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `datatypes`
+--
+
+INSERT INTO `datatypes` (`data_ID`, `data_Name`) VALUES
+(1, 'INT'),
+(2, 'VARCHAR'),
+(3, 'BOOLEAN'),
+(4, 'ENUM');
 
 -- --------------------------------------------------------
 
@@ -69,7 +96,21 @@ CREATE TABLE `db` (
 
 INSERT INTO `db` (`db_ID`, `db_Name`, `Author`) VALUES
 (9, 'SFV', 3),
-(10, 'Tekken 7', 3);
+(10, 'Tekken 7', 3),
+(21, 'Send help', 9);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `enum`
+--
+
+CREATE TABLE `enum` (
+  `enum_ID` int(11) NOT NULL,
+  `ind` int(11) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `attr_ID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -176,7 +217,8 @@ INSERT INTO `tb` (`tb_ID`, `tb_Name`, `db_ID`) VALUES
 (18, 'Stages', 9),
 (19, 'Boss', 9),
 (20, 'Skills', 10),
-(21, 'Characters', 10);
+(21, 'Characters', 10),
+(28, 'helpishere', 21);
 
 -- --------------------------------------------------------
 
@@ -210,7 +252,14 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `type`) VALUES
 --
 ALTER TABLE `attributes`
   ADD PRIMARY KEY (`attr_ID`),
-  ADD KEY `attributes_ibfk_1` (`tb_ID`);
+  ADD KEY `attributes_ibfk_1` (`tb_ID`),
+  ADD KEY `datatype` (`datatype`);
+
+--
+-- Indexes for table `datatypes`
+--
+ALTER TABLE `datatypes`
+  ADD PRIMARY KEY (`data_ID`);
 
 --
 -- Indexes for table `db`
@@ -218,6 +267,13 @@ ALTER TABLE `attributes`
 ALTER TABLE `db`
   ADD PRIMARY KEY (`db_ID`),
   ADD KEY `Author` (`Author`);
+
+--
+-- Indexes for table `enum`
+--
+ALTER TABLE `enum`
+  ADD PRIMARY KEY (`enum_ID`),
+  ADD KEY `attr_ID` (`attr_ID`);
 
 --
 -- Indexes for table `operations`
@@ -270,13 +326,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `attributes`
 --
 ALTER TABLE `attributes`
-  MODIFY `attr_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `attr_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `datatypes`
+--
+ALTER TABLE `datatypes`
+  MODIFY `data_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `db`
 --
 ALTER TABLE `db`
-  MODIFY `db_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `db_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `enum`
+--
+ALTER TABLE `enum`
+  MODIFY `enum_ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `operations`
@@ -300,7 +368,7 @@ ALTER TABLE `rows`
 -- AUTO_INCREMENT for table `tb`
 --
 ALTER TABLE `tb`
-  MODIFY `tb_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `tb_ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -316,13 +384,20 @@ ALTER TABLE `users`
 -- Constraints for table `attributes`
 --
 ALTER TABLE `attributes`
-  ADD CONSTRAINT `attributes_ibfk_1` FOREIGN KEY (`tb_ID`) REFERENCES `tb` (`tb_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `attributes_ibfk_1` FOREIGN KEY (`tb_ID`) REFERENCES `tb` (`tb_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `attributes_ibfk_2` FOREIGN KEY (`datatype`) REFERENCES `datatypes` (`data_ID`);
 
 --
 -- Constraints for table `db`
 --
 ALTER TABLE `db`
   ADD CONSTRAINT `db_ibfk_1` FOREIGN KEY (`Author`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `enum`
+--
+ALTER TABLE `enum`
+  ADD CONSTRAINT `enum_ibfk_1` FOREIGN KEY (`attr_ID`) REFERENCES `attributes` (`attr_ID`);
 
 --
 -- Constraints for table `permits`
