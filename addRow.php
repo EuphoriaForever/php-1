@@ -39,17 +39,18 @@
     $username = "root";
     $password = "";
     $dbname = "im2";
-
+    $tb_ID = 0;
+    $db_ID = 0;
+    $rowNum = 0;
+    
     if(isset($_GET['tb_ID'])){
         $tb_ID = $_GET['tb_ID'];
-    } else {
-        $tb_ID = 0;
     }
-
     if(isset($_GET['db_id'])){
         $db_ID = $_GET['db_id'];
-    } else {
-        $tb_ID = 0;
+    }
+    if(isset($_GET['row_num'])){
+        $rowNum = $_GET['row_num'];
     }
 
     $conn = new mysqli($server,$username,$password,$dbname);
@@ -57,10 +58,12 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
+
     $sql = "SELECT * FROM attributes WHERE tb_ID = $tb_ID";
     $result = $conn->query($sql);
-    $attributeArray = array();  
+    $attributeArray = array();  // checking if attributes for this table exists
     if($result->num_rows > 0){
+        //populating attribute arrays
         while($attribute = $result->fetch_assoc()){
             if($attribute['isPrimary'] == 1){ // if primary key move to the front of the array
                 array_unshift($attributeArray, $attribute);
@@ -68,22 +71,43 @@
                 $attributeArray[] = $attribute;
             }
         }
-        
-        //forms for inserting
+        //populating value arrays
+        if($rowNum!=0){
+            $valueArray = array();
+            for($ctr=0; $ctr<count($attributeArray); $ctr++){
+                $sql = 'SELECT value FROM `rows` WHERE `rowNum`='.$rowNum.' AND `attr_ID`='.$attributeArray[$ctr]['attr_ID'];
+                $value = $conn->query($sql);
+                if($value!=null&&$value->num_rows>0){
+                    $insertVal = $value->fetch_assoc();
+                } else { // we can add 'if attribute is nullable' test case
+                    $insertVal = array("value" => "");
+                }
+                $valueArray[] = $insertVal;
+            }
+        }
+        // now we have 2 arrays for both attributes and values
+
+        // forms for inserting
         echo '<form action="addRow.php" method="POST" enctype="multipart/form-data">';
         for($ctr=0; $ctr<count($attributeArray); $ctr++){
-            // if characters only if varchar and numbers only if int
-            if($attributeArray[$ctr]['isAutoInc']!=1){
+            // if characters only varchar; numbers only if int (add more datatypes?)
+            // if rownum!=0 then it means it's edit so we can disregard auto-inc shenanigans
+            if($attributeArray[$ctr]['isAutoInc']!=1||$rowNum!=0){
                 switch($attributeArray[$ctr]['datatype']){
                     case 'INT': $input = 'number'; break;
                     case 'varchar': $input = 'text'; break;
+                }
+                if($rowNum!=0){
+                    $value = $valueArray[$ctr]["value"];
+                } else {
+                    $value = '';
                 }
                 // potential problem for attributes that are named the same?
                 echo '
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label>'.$attributeArray[$ctr]["attr_Name"].'</label>
-                        <input type="'.$input.'" class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" required>
+                        <input type="'.$input.'" class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" value="'.$value.'" required>
                     </div>
                 </div>
                 ';
@@ -93,11 +117,15 @@
                 if($result!=null && $result->num_rows > 0){
                     $preVal = ($result->fetch_assoc())['value'];
                     $preVal++;
+                    // there's a better way to write this but i'm lazy
                     echo '<input type="hidden"  class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" value="'.$preVal.'" id="tb_ID"  required>';
                 } else {
                     echo '<input type="hidden"  class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" value=1 id="tb_ID"  required>';
                 }
             }
+        }
+        if($rowNum!=0){
+            echo '<input type="hidden"  class="form-control" name="rowNum" value="'.$rowNum.'" id="db_ID"  required>';
         }
         echo '
         <input type="hidden"  class="form-control" name="db_ID" value="'.$db_ID.'" id="db_ID"  required>
@@ -112,6 +140,13 @@
     if(isset($_POST['submit'])){
         $tb_ID = $_POST['tb_ID'];
         $db_ID = $_POST['db_ID'];
+        // using numrow variable to differentiate between edit and create
+        if(isset($_POST['rowNum'])){
+            $editnumRow = $_POST['rowNum'];
+        } else {
+            $editnumRow = 0;
+        }
+        // recreate attribute array
         $sql = "SELECT * FROM attributes WHERE tb_ID = $tb_ID";
         $result = $conn->query($sql);
         $attributeArray = array();  
@@ -123,28 +158,35 @@
                     $attributeArray[] = $attribute;
                 }
             }
-            $message= "worked";
-        } else {
-            $message = "didn't work";
         }
         $isOkay = checkPermit('3',$db_ID,$conn);
         if($isOkay==TRUE){   
-            // auto increment check previous entry
-            // for rows table insert by attribute and value
-            // you need attributeID, value and last row number
-            // check primary key's latest rowNum
-            $sql = "SELECT * FROM `rows` WHERE `attr_ID`=".$attributeArray[0]['attr_ID']." ORDER BY `rowNum` DESC LIMIT 1";
-            $checklastRowNum = $conn->query($sql);
-            if($checklastRowNum!=null && $checklastRowNum->num_rows>0){
-                $rowNum = (($checklastRowNum->fetch_assoc())['rowNum'])+1;
-                
+            if($editnumRow!=0){
+                // if editnumRow exists
+                for($ctr=0; $ctr<count($attributeArray); $ctr++){
+                    $sql = 'UPDATE `rows` SET `value`="'.$_POST[$attributeArray[$ctr]['attr_ID']].'" WHERE `rowNum`='.$editnumRow.' AND `attr_ID`='.$attributeArray[$ctr]['attr_ID'];
+                    $checkifempty = $conn->query($sql);
+                    if($checkifempty==null || $checkifempty->num_rows == 0){
+                        $sql = "INSERT INTO `rows`(rowNum, attr_ID, value) VALUES($editnumRow, ".$attributeArray[$ctr]['attr_ID'].", '".$_POST[$attributeArray[$ctr]['attr_ID']]."')";
+                        $conn->query($sql);
+                    }
+                }
             } else {
-                $rowNum = 1;
-            }
-
-            for($ctr=0; $ctr<count($attributeArray); $ctr++){
-                $sql = "INSERT INTO `rows`(rowNum, attr_ID, value) VALUES($rowNum, ".$attributeArray[$ctr]['attr_ID'].", '".$_POST[$attributeArray[$ctr]['attr_ID']]."')";
-                $conn->query($sql);
+                // auto increment check previous entry
+                // for rows table insert by attribute and value
+                // you need attributeID, value and last row number
+                // check primary key's latest rowNum
+                $sql = "SELECT * FROM `rows` WHERE `attr_ID`=".$attributeArray[0]['attr_ID']." ORDER BY `rowNum` DESC LIMIT 1";
+                $checklastRowNum = $conn->query($sql);
+                if($checklastRowNum!=null && $checklastRowNum->num_rows>0){
+                    $lastrowNum = (($checklastRowNum->fetch_assoc())['rowNum'])+1;
+                } else {
+                    $lastrowNum = 1;
+                }
+                for($ctr=0; $ctr<count($attributeArray); $ctr++){
+                    $sql = "INSERT INTO `rows`(rowNum, attr_ID, value) VALUES($lastrowNum, ".$attributeArray[$ctr]['attr_ID'].", '".$_POST[$attributeArray[$ctr]['attr_ID']]."')";
+                    $conn->query($sql);
+                }
             }
             if($ctr==count($attributeArray)){
                 echo "<script language='javascript'>alert('Information Successfully Edited!');window.location.href='database.php?db_id=$db_ID';</script>";
