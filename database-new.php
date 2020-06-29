@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="./styles/bootstrap.min.css">
     <link rel="stylesheet" href="./styles/chess.css">
@@ -25,10 +25,6 @@
     
     # check permission functions
 
-    function isAllowed($op) {
-      return in_array($op, $GLOBALS['permissions']);
-    }
-
     # check if db with that ID exists
     if($dbResult->num_rows > 0) {
       # actions here
@@ -47,25 +43,7 @@
       }
       
       # get your permissions
-      $permissions = array();
-
-      if($_SESSION['Succeed']['type'] === 'administrator' || $db['authorID'] === $_SESSION['Succeed']['id']) {
-
-        # if admin, add all perms
-        array_push($permissions, 1, 2, 3, 4);
-      } else {
-
-        # if user, add only allowed perms
-        $checkPermit = $conn->query("SELECT * FROM permits WHERE user_ID = ".$_SESSION['Succeed']['id']." AND db = $db_id");
-
-        if($checkPermit) {
-          if($checkPermit->num_rows > 0) {
-            while($permit = $checkPermit->fetch_assoc()) {
-              array_push($permissions, $permit['operation']);
-            }
-          }
-        }
-      }
+      $permissions = permissions($db_id);
 
       # get all tables of that database
       $getTablesQuery = "SELECT * FROM tb WHERE db_ID = $db_id";
@@ -178,7 +156,7 @@
             $checkPerms = $conn->query("SELECT * FROM permits WHERE db = $db_id AND user_ID = $userID");
 
 
-            if($checkPerms->num_rows === 3) { # if they have 4 permissions on the database (meaning complete crud), save them under "all access"
+            if($checkPerms->num_rows === 3 || $checkPerms->num_rows === 4) { # if they have 4 permissions on the database (meaning complete crud), save them under "all access"
               $permitted[$user]['perms'] = array("All Access");
             } else if ($checkPerms->num_rows > 0) {
 
@@ -275,7 +253,7 @@
 
                 <div class="row justify-content-end pr-3">
                   <?php if(isAllowed(1)) { ?>
-                    <a href="addValues.php?tb_id=<?php echo $tb['id']; ?>" class="btn btn-success">
+                    <a href="addValues.php?tb_id=<?php echo $tb['id']; ?>&db_id=<?php echo $db_id; ?>" class="btn btn-success">
                       <i class="fa fa-plus mr-1"></i>
                       Insert Values
                     </a>
@@ -369,8 +347,8 @@
 
                       <div class="form-group col-md-6 col-sm-12">
                         <label class="required" for="datatype-<?php echo $ind; ?>">Datatype</label>
-                        <select class="form-control" name="datatype" id="datatype-<?php echo $ind; ?>" required>
-                          <option value="-1" style="display: none" selected>Choose datatype...</option>
+                        <select index="<?php echo $ind; ?>" class="form-control" name="datatype" id="datatype-<?php echo $ind; ?>" required>
+                          <option value="" style="display: none" selected>Choose datatype</option>
                           <?php foreach($datatypes as $id => $val) { ?>
                             <option value="<?php echo $id; ?>"><?php echo $val; ?></option>
                           <?php } ?>
@@ -383,28 +361,22 @@
                         <label for="limitation-<?php echo $ind; ?>" class="required">Limitation</label>
                         <input type="number" name="limitation" id="limitation-<?php echo $ind; ?>" class="form-control" placeholder="0000" required>
                       </div>
-
-                      <div class="form-group col-md-6 col-sm-12">
-                        <div class="custom-control custom-switch">
-                          <input type="checkbox" name="isPrimary" value="1" id="primary-<?php echo $ind; ?>" class="custom-control-input">
-                          <label for="primary-<?php echo $ind; ?>" class="custom-control-label">Primary Key</label>
-                        </div>
-
-                        <div class="custom-control custom-switch">
-                          <input type="checkbox" name="isAutoInc" value="1" id="autoInc-<?php echo $ind; ?>" class="custom-control-input">
-                          <label for="autoInc-<?php echo $ind; ?>" class="custom-control-label">Auto Increment</label>
-                        </div>
-
-                        <div class="custom-control custom-switch">
-                          <input type="checkbox" name="isNull" value="1" id="null-<?php echo $ind; ?>" class="custom-control-input">
-                          <label for="null-<?php echo $ind; ?>" class="custom-control-label">Nullable</label>
-                        </div>
+                      
+                      <div class="form-group col-md 6 col-sm-12">
+                        <label for="values-<?php echo $ind; ?>">Enum Values <span class="badge badge-pill badge-dark" data-toggle="tooltip" title="Separate each option with a comma"><i class="fa fa-question"></i></span> </label>
+                        <input type="text" name="values" id="values-<?php echo $ind; ?>" class="form-control" placeholder="option1,option2,option3" disabled>
                       </div>
                     </div>
 
                     <div class="form-row">
                       <div class="form-group col-md-6 col-sm-12">
-                        <label class="hidden">Empty</label>
+                        <small class="hidden">Empty</small>
+
+                        <div class="custom-control custom-switch">
+                          <input type="checkbox" name="isNull" value="1" id="null-<?php echo $ind; ?>" class="custom-control-input">
+                          <label for="null-<?php echo $ind; ?>" class="custom-control-label">Nullable</label>
+                        </div>
+
                         <div class="custom-control custom-switch">
                           <input type="checkbox" name="isFK" value="1" id="fk-<?php echo $ind; ?>" class="custom-control-input" index="<?php echo $ind; ?>">
                           <label for="fk-<?php echo $ind; ?>" class="custom-control-label">Foreign Key</label>
@@ -414,7 +386,7 @@
                       <div class="form-group col-md-6 col-sm-12">
                         <label for="FK_of-<?php echo $ind; ?>">Choose a Table</label>
                         <select name="FK_of" id="FK_of-<?php echo $ind; ?>" class="form-control" disabled>
-                          <option selected value="-1" style="display: none">Choose</option>
+                          <option value="" style="display: none">Choose</option>
                           <!-- loop through our primaries collection and display the tables -->
                           <?php
 
@@ -436,7 +408,9 @@
 
                         <input type="hidden" name="table_ID" value="<?php echo $tb['id']; ?>">
                       </div>
-                      
+                    </div>
+
+                    <div class="form-row">
                       <?php if(!empty($tb['headers'])) { ?>
                         <div class="form-group col-12">
                           <label for="position-<?php echo $ind; ?>">Insert...</label>
@@ -799,21 +773,63 @@
 
    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script>
       $(document).ready(()=>{
         $('input[name*="isFK"]').click((e)=>{
           let code = $(e.target).attr('index');
           if($(e.target).is(":checked")) {
             $(`select#FK_of-${code}`).removeAttr("disabled");
+            $(`select#FK_of-${code}`).attr("required", "");
+            $(`label[for=FK_of-${code}]`).addClass("required");
+
+            $(`select#datatype-${code}`).val('1');
+            $(`input#limitation-${code}`).val('10');
           } else {
+            $(`select#FK_of-${code}`).removeAttr("required");
             $(`select#FK_of-${code}`).attr("disabled", "");
+            $(`label[for=FK_of-${code}]`).removeClass("required");
+
+            $(`select#datatype-${code}`).val('');
+            $(`input#limitation-${code}`).val('');
           }
-        })
+        });
+
+        $('select[name=datatype]').change((e)=>{
+          let code = $(e.target).attr('index');
+
+          if($(e.target).val() == 4 || $(e.target).val() == 3) {
+
+            $(`input#limitation-${code}`).removeAttr("required");
+            $(`input#limitation-${code}`).attr("disabled", "");
+            $(`label[for=limitation-${code}]`).removeClass("required");
+
+          } else {
+
+            $(`input#limitation-${code}`).removeAttr("disabled");
+            $(`input#limitation-${code}`).attr("required", "");
+            $(`label[for=limitation-${code}`).addClass("required");
+
+          }
+
+          if($(e.target).val() == 4) {
+
+            $(`input#values-${code}`).removeAttr("disabled");
+            $(`input#values-${code}`).attr("required", "");
+            $(`label[for=values-${code}`).addClass("required");
+
+          } else {
+
+            $(`input#values-${code}`).attr("disabled", "");
+            $(`input#values-${code}`).removeAttr("required");
+            $(`label[for=values-${code}`).removeClass("required");
+
+          }
+        });
       });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
   
 </body>
 </html>

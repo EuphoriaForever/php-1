@@ -2,7 +2,7 @@
   session_start();
   include "connectDB.php";
   include "checkLogin.php";
-  
+
   # add permissions
   if(isset($_POST['addPerms'])) {
 
@@ -167,14 +167,47 @@
         addAlert("That table already has a primary key.", "danger");
       } else {
 
-        # create PK
-        $createPK = $conn->query("INSERT INTO attributes(attr_Name,colNum,datatype,limitation,isPrimary,isAutoinc,`isNull`,isFK,tb_ID) VALUES('ID',1,'INT',10,1,1,0,0,$tb)");
+        #check if it's inserted in the middle, and move other columns accordingly
+        $checkCol = $conn->query("SELECT * FROM attributes WHERE colNum = 1 AND tb_ID = $tb");
 
-        if(!$createPK) {
+        if(!$checkCol) {
           addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
         } else {
-          addAlert("Successfully created Primary Key (ID)!", "success");
+          if($checkCol->num_rows > 0) {
+
+            # get that column and everything after that
+            $moveCol = $conn->query("SELECT * FROM attributes WHERE colNum >= 1 AND tb_ID = $tb");
+
+            if(!$moveCol) {
+              addAlert("<b>Uh oh!</b> Something went wrong. movecol ".$conn->error, "danger");
+            } else {
+              while($colRow = $moveCol->fetch_assoc()) {
+
+                # start moving
+                $colID = $colRow['attr_ID'];
+                $newPos = $colRow['colNum'] + 1;
+
+                if(!$conn->query("UPDATE attributes SET colNum = $newPos WHERE attr_ID = $colID")) {
+                  addAlert("<b>Uh oh!</b> Something went wrong. updating colnum ".$conn->error, "danger");
+                }
+              }
+
+            }
+          }
+          
+          if(empty($_SESSION['alerts'])) {
+            # create PK
+            $createPK = $conn->query("INSERT INTO attributes(attr_Name,colNum,datatype,limitation,isPrimary,isAutoinc,`isNull`,isFK,tb_ID) VALUES('ID',1,1,10,1,1,0,0,$tb)");
+
+            if(!$createPK) {
+              addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
+            } else {
+              addAlert("Successfully created Primary Key (ID)!", "success");
+            }
+          }
         }
+
+        
       }
     }
   } else
@@ -185,22 +218,17 @@
 
     # save inputs
     $name = $_POST['attr_name'];
-    $type = $_POST['datatype'];
-    $limit = $_POST['limitation'];
-    $pk = isset($_POST['isPrimary']) ? 1 : 0;
-    $autoInc = isset($_POST['isAutoInc']) ? 1 : 0;
-    $null = isset($_POST['isNull']) ? 1 : 0;
     $fk = isset($_POST['isFK']) ? 1 : 0;
-    $fkOf = isset($_POST['isFK']) ? $_POST['FK_of'] : 0;
+    $type = $fk === 1 ? 1 : $_POST['datatype'];
+    $limit = $fk === 1 ? 0 : $type != 4 && $type != 3 ? $_POST['limitation'] : 0;
+    $null = isset($_POST['isNull']) ? 1 : 0;
+    $fkOf = $fk === 1 ? $_POST['FK_of'] : 0;
     $tb = $_POST['table_ID'];
     $pos = $_POST['position'];
+    $enumValues = $type == 4 ? explode(",", $_POST['values']) : null;
 
-    if($fk===1 && $fkOf===0) {
-      addAlert("You need to link a foreign key to a table!", "danger");
-    } else if(strcmp($name, str_replace(' ', '', $name)) !== 0) {
+    if(strcmp($name, str_replace(' ', '', $name)) !== 0) {
       addAlert("<b>Uh oh!</b> There must be no spaces in the attribute name.", "danger");
-    } else if ($type === -1) {
-      addAlert("Please select a datatype!", "danger");
     } else {
 
       # check if attribute already exists
@@ -243,7 +271,7 @@
             
             if(empty($_SESSION['alerts'])) {
               # create if it doesn't
-              $createAttr = $conn->query("INSERT INTO attributes(attr_Name,colNum,datatype,limitation,isPrimary,isAutoInc,`isNull`,isFK,tb_ID) VALUES('$name',$pos,'$type',$limit,$pk,$autoInc,$null,$fk,$tb)");
+              $createAttr = $conn->query("INSERT INTO attributes(attr_Name,colNum,datatype,limitation,isPrimary,isAutoInc,`isNull`,isFK,tb_ID) VALUES('$name',$pos,$type,$limit,0,0,$null,$fk,$tb)");
     
               if(!$createAttr) {
                 addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
@@ -261,7 +289,24 @@
                   $conn->query("DELETE FROM attributes WHERE attr_ID = $insertID");
                   addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
                 }
-              } else {
+              } else if($type == 4) {
+                # get the id of the insert entry
+                $insertID = $conn->insert_id;
+
+                foreach($enumValues as $ind => $enumVal) {
+                  $enumVal = str_replace(" ", "", $enumVal);
+                  $conn->query("INSERT INTO enum(`value`,attr_ID) VALUES('$enumVal',$insertID)");
+                  if($conn->error) {
+                    addAlert("<b>Uh oh!</b> Something went wrong. ".$conn->error, "danger");
+                  }
+                }
+
+                if(empty($_SESSION['alerts'])) {
+                  addAlert("Successfully created attribute!", "success");
+                } else {
+                  $conn->query("DELETE FROM attributes WHERE attr_ID = $insertID");
+                }
+              } else{
                 addAlert("Successfully created attribute!", "success");
               }
             }
