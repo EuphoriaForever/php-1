@@ -350,11 +350,11 @@
                                                     <div class="form-row">
                                                             <div class="form-group col-md-5">
                                                                 <label for="attr_Name">Attribute Name</label>
-                                                                <input type="text" class="form-control" name="attr_Name" placeholder="Enter number from 1 to 3 (for now 1 = INT, 2 = VARCHAR, 3 = BOOLEAN)" required>
+                                                                <input type="text" class="form-control" name="attr_Name" placeholder="Enter name" required>
                                                            </div>
                                                            <div class="form-group col-md-4">
                                                                 <label for="datatype">Datatype</label>
-                                                                <input type="text" class="form-control" name="datatype" placeholder="Enter datatype" required>
+                                                                <input type="text" class="form-control" name="datatype" placeholder="1: int, 2: varchar, 3: boolean" required>
                                                           </div>
                                                           <div class="form-group col-md-3">
                                                           <label for="limitation">Limitation</label>
