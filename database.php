@@ -551,12 +551,12 @@
                     #after all of the checking, we see if we're still good to input the new attribute
 
                   if($isOkay === TRUE){
-                    $sql3 = "INSERT INTO attributes (attr_Name,colNum,datatype,limitation,isPrimary,isAutoInc,isNull,isFK,tb_ID) VALUES ('$attr_Name',0,$datatype,$limitation''$isPrimary','$isAutoInc','$isNull','$isFK','$tb_ID')";
+                    $sql3 = "INSERT INTO attributes (attr_Name,colNum,datatype,limitation,isPrimary,isAutoInc,isNull,isFK,tb_ID) VALUES ('$attr_Name',0,$datatype,'$limitation','$isPrimary','$isAutoInc','$isNull','$isFK','$tb_ID')";
                     if($conn->query($sql3)===TRUE){
                       echo "<script language='javascript'>alert('A new Attribute has been created!');window.location.href='database.php?db_id=$db_ID';</script>";
                     } else {
                       addAlert("Okay something went wrong.".$conn->error, "danger");
-                      header("Location: database.php?db_id=$db_ID");
+                      echo "<script>window.location.href='database.php?db_id=$db_ID'</script>";
                     }
                   }
 
