@@ -15,26 +15,10 @@
 
     session_start(); #start session in each form validation page so that we can all access the super global var $_SESSION
 
-    
-    if(!isset($_SESSION['Succeed'])) { #if there is no current login session detected, go to login page
-      header("Location: login.php");
-    }else{
+    include "connectDB.php";
+    include "checkLogin.php";
 
-    //   if($_SESSION['users'][$_SESSION['Succeed']]['type'] ==="administrator"){
-    //     include "./includes/navbarAdmin.php";
-    //   }else {
-    //     include "./includes/navbarUser.php";
-    //   }
-        include "./includes/navbarMain.php";
-
-    }
-
-    if(isset($_GET['logout'])) { #if u wanna logout, remove current login session and redirect to login page
-      unset($_SESSION['Succeed']);
-      header("Location: login.php");
-    }
-
-    
+    displayAlert();    
   ?>
   <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
     <!--Adding Table BOC-->
@@ -364,7 +348,7 @@
                                                     <div class="form-row">
                                                             <div class="form-group col-md-5">
                                                                 <label for="attr_Name">Attribute Name</label>
-                                                                <input type="text" class="form-control" name="attr_Name" placeholder="Enter attribute name" required>
+                                                                <input type="text" class="form-control" name="attr_Name" placeholder="Enter number from 1 to 3 (for now 1 = INT, 2 = VARCHAR, 3 = BOOLEAN)" required>
                                                            </div>
                                                            <div class="form-group col-md-4">
                                                                 <label for="datatype">Datatype</label>
@@ -549,10 +533,10 @@
                                           $row = $result->fetch_assoc();
                                           $attr_ID = $row['attr_ID'];
 
-                                          $sql2 = "UPDATE attributes SET isParent = '1' , ParentOf = '$tb_ID' WHERE attr_ID = $attr_ID";
-                                              if($conn->query($sql2)===TRUE){
+                                          // $sql2 = "UPDATE attributes SET isParent = '1' , ParentOf = '$tb_ID' WHERE attr_ID = $attr_ID";
+                                          //     if($conn->query($sql2)===TRUE){
                                                 $isOkay = TRUE;
-                                              }
+                                              // }
                                        }
 
                               }
@@ -565,9 +549,12 @@
                     #after all of the checking, we see if we're still good to input the new attribute
 
                   if($isOkay === TRUE){
-                    $sql3 = "INSERT INTO attributes (attr_ID,attr_Name,datatype,limitation,isPrimary,isAutoInc,isNull,isParent,ParentOf,isFK,FK_of,tb_ID) VALUES ('','$attr_Name','$datatype','$limitation','$isPrimary','$isAutoInc','$isNull','0','0','$isFK','$FK_of','$tb_ID')";
+                    $sql3 = "INSERT INTO attributes (attr_Name,colNum,datatype,limitation,isPrimary,isAutoInc,isNull,isFK,tb_ID) VALUES ('$attr_Name',0,$datatype,$limitation''$isPrimary','$isAutoInc','$isNull','$isFK','$tb_ID')";
                     if($conn->query($sql3)===TRUE){
                       echo "<script language='javascript'>alert('A new Attribute has been created!');window.location.href='database.php?db_id=$db_ID';</script>";
+                    } else {
+                      addAlert("Okay something went wrong.".$conn->error, "danger");
+                      header("Location: database.php?db_id=$db_ID");
                     }
                   }
 
