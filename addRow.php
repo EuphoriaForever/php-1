@@ -94,8 +94,10 @@
             // if rownum!=0 then it means it's edit so we can disregard auto-inc shenanigans
             if($attributeArray[$ctr]['isAutoInc']!=1||$rowNum!=0){
                 switch($attributeArray[$ctr]['datatype']){
-                    case 'INT': $input = 'number'; break;
-                    case 'varchar': $input = 'text'; break;
+                    case 1: $input = 'number'; break;
+                    case 2: $input = 'text'; break;
+                    case 3: $input = 'select'; break;
+                    // case 4 enum how to implement?
                 }
                 if($rowNum!=0){
                     $value = $valueArray[$ctr]["value"];
@@ -103,14 +105,26 @@
                     $value = '';
                 }
                 // potential problem for attributes that are named the same?
-                echo '
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label>'.$attributeArray[$ctr]["attr_Name"].'</label>
-                        <input type="'.$input.'" class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" value="'.$value.'" required>
+                if($input == 'number' || $input == 'text'){
+                    echo '
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>'.$attributeArray[$ctr]["attr_Name"].'</label>
+                            <input type="'.$input.'" class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" value="'.$value.'" required>
+                        </div>
                     </div>
-                </div>
-                ';
+                    ';
+                } else if ($input == 'select'){
+                    // add select and options html
+                    echo '
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>'.$attributeArray[$ctr]["attr_Name"].'</label>
+                            <input type="'.$input.'" class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" value="'.$value.'" required>
+                        </div>
+                    </div>
+                    ';
+                }
             } else {
                 $sql = "SELECT * FROM `rows` WHERE `attr_ID`=".$attributeArray[$ctr]['attr_ID']." ORDER BY `rowNum` DESC LIMIT 1";
                 $result = $conn->query($sql);
@@ -194,16 +208,16 @@
                 echo "sad life";
             }
         }else{
-            echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$db_ID';</script>";
+            // echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$db_ID';</script>";
         }
     }
 
     function checkPermit($operation,$db_ID,$conn){
         $isOkay = FALSE;
-        if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
+        if($_SESSION['Succeed']['type'] === 'administrator'){
             $isOkay = TRUE;
         }else{
-            $username = $_SESSION['Succeed'];
+            $username = $_SESSION['Succeed']['username'];
             $sql = "SELECT * FROM users WHERE username ='$username'";
             $result = $conn->query($sql);
             if($result->num_rows>0){
