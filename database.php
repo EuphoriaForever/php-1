@@ -306,6 +306,7 @@
                                   for($ctr=0; $ctr<count($attributeArray); $ctr++){
                                     echo "<th>".$attributeArray[$ctr]['attr_Name']."</th>";
                                   }
+                                  echo '<th>Edit/Delete</th>';
                                   echo "</tr></thead>";
                                   $rowNum=1;
                                   do{
@@ -320,6 +321,7 @@
                                         echo "<td><i>emptyfield草</i></td>";
                                       }
                                     }
+                                    echo '<td><a class="btn btn-info" href="addRow.php?tb_ID='.$row2['tb_ID'].'&row_num='.$rowNum.'&db_id='.$db_id.'">Edit Row</a></td>';
                                     echo "</tr>";
                                     // check if the next row num exists
                                     $rowNum++;
