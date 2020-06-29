@@ -116,11 +116,20 @@
                     ';
                 } else if ($input == 'select'){
                     // add select and options html
+                    $true = $false = '';
+                    if($value = 'TRUE'){
+                        $true = 'selected';
+                    } else if ($value = 'FALSE'){
+                        $false = 'selected';
+                    }
                     echo '
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>'.$attributeArray[$ctr]["attr_Name"].'</label>
-                            <input type="'.$input.'" class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" value="'.$value.'" required>
+                            <select class="form-control" name="'.$attributeArray[$ctr]["attr_ID"].'" required>
+                                <option value="TRUE" '.$true.'>TRUE</option>
+                                <option value="FALSE" '.$false.'>FALSE</option>
+                            </select>
                         </div>
                     </div>
                     ';
@@ -180,7 +189,7 @@
                 for($ctr=0; $ctr<count($attributeArray); $ctr++){
                     $sql = 'UPDATE `rows` SET `value`="'.$_POST[$attributeArray[$ctr]['attr_ID']].'" WHERE `rowNum`='.$editnumRow.' AND `attr_ID`='.$attributeArray[$ctr]['attr_ID'];
                     $checkifempty = $conn->query($sql);
-                    if($checkifempty==null || $checkifempty->num_rows == 0){
+                    if($checkifempty==null && $checkifempty->num_rows == 0){
                         $sql = "INSERT INTO `rows`(rowNum, attr_ID, value) VALUES($editnumRow, ".$attributeArray[$ctr]['attr_ID'].", '".$_POST[$attributeArray[$ctr]['attr_ID']]."')";
                         $conn->query($sql);
                     }
