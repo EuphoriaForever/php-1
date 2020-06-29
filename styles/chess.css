@@ -14,7 +14,7 @@ label.required::after {
   content: ' *';
 }
 
-label.hidden {
+.hidden {
   color: transparent;
   user-select: none;
 }
