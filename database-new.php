@@ -275,7 +275,7 @@
 
                 <div class="row justify-content-end pr-3">
                   <?php if(isAllowed(1)) { ?>
-                    <a href="addValues.php?tb_id=<?php echo $tb['id']; ?>" class="btn btn-success">
+                    <a href="addRow.php?tb_id=<?php echo $tb['id']; ?>" class="btn btn-success">
                       <i class="fa fa-plus mr-1"></i>
                       Insert Values
                     </a>
