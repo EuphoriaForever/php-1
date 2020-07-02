@@ -24,10 +24,8 @@
     <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">       
       <a class="btn btn-danger" href="profile.php?delete_ID=<?php echo$_SESSION['Succeed']['id'] ?>">Delete Profile</a>
       <a class="btn btn-info" href="profile.php?user_ID=<?php echo $_SESSION['Succeed']['id'] ?>">Edit Profile Name</a>
-    </div>
-         
+    </div>         
           THIS IS A MARKER FOR ME CAUSE I GET LOST IN THE INSPECTOR MODE A LOT HUHUHUHU 
-
     <?php 
     #this too me longer than I would like to admit 
        $conn = new mysqli("localhost","root","","im2");
@@ -57,8 +55,8 @@
                             <div class="form-row">
                                  <div class="form-group col-md-6">
                                      <label for="fname">Username</label>
-                                     <input type="text" class="form-control" name="username" value="'.$data['username'].'" placeholder="Enter new username" required>
-                                     <input type="hidden"  class="form-control" name="user_id" value="'.$user.'" id="user_id"  required>
+                                     <input type="text" class="form-control" name="old_name" value="'.$data['username'].'" placeholder="Enter new username" required>
+                                     <input type="hidden"  class="form-control" name="user_id" value="'.$data['user_id'].'" id="user_id"  required>
                                   </div>
                              </div>
           
@@ -70,13 +68,13 @@
             }
           }
           if(isset($_POST['submit'])){
-                $user_name = $_POST['username'];
+                $user_name = $_POST['old_name'];
                 $user_id = $_POST['user_id'];
-                  $sql = "UPDATE users SET username = $user_name WHERE user_id=$user_id;";
+                  $sql = "UPDATE users SET username='$user_name' WHERE user_id=$user_id;";
                     if($conn->query($sql)===TRUE){
-                      echo "<script language='javascript'>alert('Information Successfully Edited!');window.location.href='profile.php?user_id=$user_id';</script>";
+                      echo "<script language='javascript'>alert('Username Updated!');window.location.href='profile.php?user_id=$user_id';</script>";
                     }else{
-                      echo "<script language='javascript'>alert('HAKDOG');window.location.href='profile.php?user_id=$user_id';</script>";
+                      echo "ERROR!:".$conn->error;
                     }              
             }
 
