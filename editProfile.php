@@ -3,6 +3,8 @@
     include "connectDB.php";
     include "checkLogin.php";
     displayAlert();        
+    $user="";  
+    $conn = new mysqli("localhost","root","","im2");
 ?>
 
 <html>
@@ -16,9 +18,7 @@
 <body class="bg-secondary">     
           <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
 <?php     
-           $user="";
-           $conn = new mysqli("localhost","root","","im2");
-           
+           #start of username changing
            if(isset($_GET['edit_ID'])){
             $user=$_GET['edit_ID'];
             }
@@ -28,8 +28,8 @@
               }else{            
                 $sql_1="SELECT * FROM users WHERE user_id=$user";
                       if($conn->query($sql_1)){              
-                          $result=$conn->query($sql_1);
-                          $data=$result->fetch_assoc();
+                          $result1=$conn->query($sql_1);
+                          $data=$result1->fetch_assoc();
                               echo'
                                   <form action="editProfile.php" method="POST" enctype="multipart/form-data">
                                         <div class="form-row">
@@ -57,13 +57,8 @@
                                   echo "ERROR!:".$conn->error;
                                 }              
                       }
-            }
-            
-            $pass="";
-            if(isset($_GET['pass_ID'])){
-              echo"changing of pass happens here";
-            }
-?>
+            }#end of username changing
+?>                           
           </div>
 
    <!-- Optional JavaScript -->

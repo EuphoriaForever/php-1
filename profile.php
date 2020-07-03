@@ -17,7 +17,7 @@
     <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">             
       <a class="btn btn-danger" href="profile.php?delete_ID=<?php echo$_SESSION['Succeed']['id'] ?>">Delete Profile</a>
       <a class="btn btn-info" href="editProfile.php?edit_ID=<?php echo $_SESSION['Succeed']['id'] ?>">Change Username</a>
-      <a class="btn btn-info" href="editProfile.php?pass_ID=<?php echo $_SESSION['Succeed']['id'] ?>">Change Password</a>
+      <a class="btn btn-info" href="changePassword.php?pass_ID=<?php echo $_SESSION['Succeed']['id'] ?>">Change Password</a>
     </div>              
 
     <?php 
