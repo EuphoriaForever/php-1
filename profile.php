@@ -24,8 +24,7 @@
     <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">       
       <a class="btn btn-danger" href="profile.php?delete_ID=<?php echo$_SESSION['Succeed']['id'] ?>">Delete Profile</a>
       <a class="btn btn-info" href="profile.php?user_ID=<?php echo $_SESSION['Succeed']['id'] ?>">Edit Profile Name</a>
-    </div>
-          <?php echo ''.$_SESSION['Succeed']['username'].''?>         
+    </div>              
           <br>THIS IS A MARKER FOR ME CAUSE I GET LOST IN THE INSPECTOR MODE A LOT HUHUHUHU
     <?php 
     #this too me longer than I would like to admit 
@@ -55,8 +54,8 @@
                       <form action="profile.php" method="POST" enctype="multipart/form-data">
                             <div class="form-row">
                                  <div class="form-group col-md-6">
-                                     <label for="fname">Username</label>
-                                     <input type="text" class="form-control" name="new_name" value="'.$data['username'].'" placeholder="Enter new username" required>
+                                     <label for="fname">Asshole</label>
+                                     <input type="text" class="form-control" name="new_name" placeholder="Enter new username" required>
                                      <input type="hidden"  class="form-control" name="user_id" value="'.$data['user_id'].'" id="user_id"  required>
                                   </div>
                              </div>
