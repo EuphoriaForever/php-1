@@ -49,6 +49,11 @@
                       if(isset($_POST['submit'])){
                             $user_name = $_POST['new_name'];
                             $user_id = $_POST['user_id'];
+                            $findUsername = $conn->query("SELECT * FROM users WHERE username = '$user_name'");
+
+                            if($findUsername->num_rows > 0) {
+                              echo"<script language='javascript'>alert('Username is already taken :(!');window.location.href='editProfile.php?edit_ID=$user_id';</script>";
+                            }else{                              
                               $sql = "UPDATE users SET username='$user_name' WHERE user_id=$user_id;";
                                 if($conn->query($sql)===TRUE){
                                   $_SESSION['Succeed']['username']=$user_name;
@@ -56,6 +61,7 @@
                                 }else{
                                   echo "ERROR!:".$conn->error;
                                 }              
+                            }
                       }
             }#end of username changing
 ?>                           
