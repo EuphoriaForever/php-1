@@ -24,8 +24,9 @@
     <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">       
       <a class="btn btn-danger" href="profile.php?delete_ID=<?php echo$_SESSION['Succeed']['id'] ?>">Delete Profile</a>
       <a class="btn btn-info" href="profile.php?user_ID=<?php echo $_SESSION['Succeed']['id'] ?>">Edit Profile Name</a>
-    </div>         
-          THIS IS A MARKER FOR ME CAUSE I GET LOST IN THE INSPECTOR MODE A LOT HUHUHUHU 
+    </div>
+          <?php echo ''.$_SESSION['Succeed']['username'].''?>         
+          <br>THIS IS A MARKER FOR ME CAUSE I GET LOST IN THE INSPECTOR MODE A LOT HUHUHUHU
     <?php 
     #this too me longer than I would like to admit 
        $conn = new mysqli("localhost","root","","im2");
@@ -55,7 +56,7 @@
                             <div class="form-row">
                                  <div class="form-group col-md-6">
                                      <label for="fname">Username</label>
-                                     <input type="text" class="form-control" name="old_name" value="'.$data['username'].'" placeholder="Enter new username" required>
+                                     <input type="text" class="form-control" name="new_name" value="'.$data['username'].'" placeholder="Enter new username" required>
                                      <input type="hidden"  class="form-control" name="user_id" value="'.$data['user_id'].'" id="user_id"  required>
                                   </div>
                              </div>
@@ -68,10 +69,11 @@
             }
           }
           if(isset($_POST['submit'])){
-                $user_name = $_POST['old_name'];
+                $user_name = $_POST['new_name'];
                 $user_id = $_POST['user_id'];
                   $sql = "UPDATE users SET username='$user_name' WHERE user_id=$user_id;";
                     if($conn->query($sql)===TRUE){
+                      $_SESSION['Succeed']['username']=$user_name;
                       echo "<script language='javascript'>alert('Username Updated!');window.location.href='profile.php?user_id=$user_id';</script>";
                     }else{
                       echo "ERROR!:".$conn->error;
@@ -80,7 +82,7 @@
 
         
      ?>
-         
+     
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
       <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
