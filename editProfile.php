@@ -34,7 +34,7 @@
                       <form action="editProfile.php" method="POST" enctype="multipart/form-data">
                             <div class="form-row">
                                  <div class="form-group col-md-6">
-                                     <label for="fname">Fuck you</label>
+                                     <label for="fname">Username</label>
                                      <input type="text" class="form-control" name="new_name" placeholder="Enter new username" required>
                                      <input type="hidden"  class="form-control" name="user_id" value="'.$data['user_id'].'" id="user_id"  required>
                                   </div>
