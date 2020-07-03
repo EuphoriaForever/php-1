@@ -23,7 +23,7 @@
 <body class="bg-secondary">
     <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">       
       <a class="btn btn-danger" href="profile.php?delete_ID=<?php echo$_SESSION['Succeed']['id'] ?>">Delete Profile</a>
-      <a class="btn btn-info" href="profile.php?user_ID=<?php echo $_SESSION['Succeed']['id'] ?>">Edit Profile Name</a>
+      <a class="btn btn-info" href="profile.php?edit_ID=<?php echo $_SESSION['Succeed']['id'] ?>">Edit Profile Name</a>
     </div>              
           <br>THIS IS A MARKER FOR ME CAUSE I GET LOST IN THE INSPECTOR MODE A LOT HUHUHUHU
     <?php 
@@ -43,8 +43,8 @@
               else{
                   echo "<script language='javascript'>alert('Uh oh! That wasn't supposed to happen!');</script>";
               }
-          }else if(isset($_GET['user_ID'])){
-            $user=$_GET['user_ID'];
+          }else if(isset($_GET['edit_ID'])){
+            $user=$_GET['edit_ID'];
             $sql_1="SELECT * FROM users WHERE user_id=$user";
 
             if($conn->query($sql_1)){              
@@ -61,7 +61,9 @@
                              </div>
           
                                   <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
+                                  <a href="profile.php?user_id='.$data['user_id'].'">
                                   <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
+                                  </a>
                       </form>
                   ';
             
