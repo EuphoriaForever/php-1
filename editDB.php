@@ -35,8 +35,6 @@
   ?>
           <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
 <?php
-
-
                     $server = "localhost";
                     $username = "root";
                     $password = "";

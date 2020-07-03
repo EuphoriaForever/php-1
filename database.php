@@ -12,12 +12,9 @@
 
   <?php
   // include "./includes/navbar.php";
-
     session_start(); #start session in each form validation page so that we can all access the super global var $_SESSION
-
     include "connectDB.php";
     include "checkLogin.php";
-
     displayAlert();    
   ?>
   <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
