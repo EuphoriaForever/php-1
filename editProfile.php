@@ -3,7 +3,7 @@
     include "connectDB.php";
     include "checkLogin.php";
     displayAlert();        
-    ?>
+?>
 
 <html>
   <head>
@@ -12,55 +12,59 @@
       <link rel="stylesheet" href="./styles/bootstrap.min.css"> 
       <title><?php echo ''.$_SESSION['Succeed']['username'].''?> Profile Edit </title>
   </head>
-<body class="bg-secondary">
-     
+
+<body class="bg-secondary">     
           <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
 <?php     
+           $user="";
+           $conn = new mysqli("localhost","root","","im2");
+           
            if(isset($_GET['edit_ID'])){
             $user=$_GET['edit_ID'];
             }
-              $conn = new mysqli("localhost","root","","im2");
               //check connection
               if($conn->connect_error){
                 die("Connection failed: " .$conn->connect_error);
-              }
+              }else{            
+                $sql_1="SELECT * FROM users WHERE user_id=$user";
+                      if($conn->query($sql_1)){              
+                          $result=$conn->query($sql_1);
+                          $data=$result->fetch_assoc();
+                              echo'
+                                  <form action="editProfile.php" method="POST" enctype="multipart/form-data">
+                                        <div class="form-row">
+                                             <div class="form-group col-md-6">
+                                                 <label for="fname">Username</label>
+                                                 <input type="text" class="form-control" name="new_name" placeholder="Enter new username" required>
+                                                 <input type="hidden"  class="form-control" name="user_id" value="'.$data['user_id'].'" id="user_id"  required>
+                                              </div>
+                                         </div>                      
+                                              <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
+                                              <a href="profile.php?user_id='.$data['user_id'].'">
+                                              <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
+                                              </a>
+                                  </form>
+                              ';                        
+                      }                                
+                      if(isset($_POST['submit'])){
+                            $user_name = $_POST['new_name'];
+                            $user_id = $_POST['user_id'];
+                              $sql = "UPDATE users SET username='$user_name' WHERE user_id=$user_id;";
+                                if($conn->query($sql)===TRUE){
+                                  $_SESSION['Succeed']['username']=$user_name;
+                                  echo "<script language='javascript'>alert('Username Updated!');window.location.href='profile.php?user_id=$user_id';</script>";
+                                }else{
+                                  echo "ERROR!:".$conn->error;
+                                }              
+                      }
+            }
             
-            $sql_1="SELECT * FROM users WHERE user_id=$user";
-
-            if($conn->query($sql_1)){              
-              $result=$conn->query($sql_1);
-              $data=$result->fetch_assoc();
-                  echo'
-                      <form action="editProfile.php" method="POST" enctype="multipart/form-data">
-                            <div class="form-row">
-                                 <div class="form-group col-md-6">
-                                     <label for="fname">Username</label>
-                                     <input type="text" class="form-control" name="new_name" placeholder="Enter new username" required>
-                                     <input type="hidden"  class="form-control" name="user_id" value="'.$data['user_id'].'" id="user_id"  required>
-                                  </div>
-                             </div>
-          
-                                  <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
-                                  <a href="profile.php?user_id='.$data['user_id'].'">
-                                  <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
-                                  </a>
-                      </form>
-                  ';
-            
-            }          
-          if(isset($_POST['submit'])){
-                $user_name = $_POST['new_name'];
-                $user_id = $_POST['user_id'];
-                  $sql = "UPDATE users SET username='$user_name' WHERE user_id=$user_id;";
-                    if($conn->query($sql)===TRUE){
-                      $_SESSION['Succeed']['username']=$user_name;
-                      echo "<script language='javascript'>alert('Username Updated!');window.location.href='profile.php?user_id=$user_id';</script>";
-                    }else{
-                      echo "ERROR!:".$conn->error;
-                    }              
+            $pass="";
+            if(isset($_GET['pass_ID'])){
+              echo"changing of pass happens here";
             }
 ?>
-    </div>
+          </div>
 
    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
