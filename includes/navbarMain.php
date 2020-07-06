@@ -31,11 +31,12 @@
                     echo '<li class="nav-item"><a class="nav-link" >No databases yet</a></li>';
                 }   
     ?>
-
     </ul>
-    <span class="navbar-text">
-      <b>Signed in as:</b> <?php echo $_SESSION['Succeed']['username']; ?>
-      <a href="?logout=true" class="text-danger ml-5">Logout</a>
-    </span>
+                                        
+               <span class="navbar-text">                      
+                <a href="profile.php?user_id=<?php echo $_SESSION['Succeed']['id'] ?>">               
+                  <b>Signed in as: </b> <?php echo $_SESSION['Succeed']['username']; ?></a>                                
+                <a href="?logout=true" class="text-danger ml-5">Logout</a>
+                </span>
   </div>
 </nav>

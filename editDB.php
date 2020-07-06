@@ -35,8 +35,6 @@
   ?>
           <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
 <?php
-
-
                     $server = "localhost";
                     $username = "root";
                     $password = "";
@@ -57,10 +55,6 @@
 
                     if($result->num_rows > 0){
                       $row = $result->fetch_assoc();
-                      
-
-
-
                     echo'
                       <form action="editDB.php" method="POST" enctype="multipart/form-data">
                       <div class="form-row">
@@ -72,12 +66,11 @@
                        </div>
     
                       <input type="submit" class="btn btn-dark text-white" value="Submit" name="submit" required>
-                      <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
+                      <a href="database.php?db_id='.$db_ID.'">
+                        <button type="button" class="btn btn-warning text-white" data-dismiss="modal">Close</button>
+                      </a>  
                     </form>
-                       ';  
-                         
-                         
-
+                       ';                          
                     }
 
                     
