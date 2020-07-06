@@ -303,7 +303,8 @@
                                   for($ctr=0; $ctr<count($attributeArray); $ctr++){
                                     echo "<th>".$attributeArray[$ctr]['attr_Name']."</th>";
                                   }
-                                  echo '<th>Edit/Delete</th>';
+                                  echo '<th>Edit</th>';
+                                  echo '<th>Delete</th>';
                                   echo "</tr></thead>";
                                   $rowNum=1;
                                   do{
@@ -319,6 +320,7 @@
                                       }
                                     }
                                     echo '<td><a class="btn btn-info" href="addRow.php?tb_ID='.$row2['tb_ID'].'&row_num='.$rowNum.'&db_id='.$db_id.'">Edit Row</a></td>';
+                                    echo '<td><a class="btn btn-danger" href="database.php?delete_row='.$rowNum.'&db_id='.$db_id.'">Delete Row</a></td>';
                                     echo "</tr>";
                                     // check if the next row num exists
                                     $rowNum++;
@@ -333,6 +335,22 @@
                                 // attribute list is empty
                               }
                               // END OF KP CODE
+
+                              //delete row from table function
+                              if(isset($_GET['delete_row'])){
+                                $row_id = $_GET['delete_row'];
+                                $db_id = $_GET['db_id'];
+  
+                                $sql = "DELETE FROM `rows` WHERE rowNum = $row_id";
+                                if($conn->query($sql)===TRUE){
+                                      echo "<script language='javascript'>alert('A row has been deleted');window.location.href='database.php?db_id=$db_id';</script>";
+                                }
+                              }
+                              //delete row from table function
+
+
+
+
                               echo '
                             <div class="modal fade text-dark" id="exampleModal'.$num.'" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
