@@ -53,6 +53,8 @@
 
                             if($findUsername->num_rows > 0) {
                               echo"<script language='javascript'>alert('Username is already taken :(!');window.location.href='editProfile.php?edit_ID=$user_id';</script>";
+                            }else if(strlen($user_name)<4){
+                              echo"<script language='javascript'>alert('Username must be more than 4 characters! :(!');window.location.href='editProfile.php?edit_ID=$user_id';</script>";
                             }else{                              
                               $sql = "UPDATE users SET username='$user_name' WHERE user_id=$user_id;";
                                 if($conn->query($sql)===TRUE){
