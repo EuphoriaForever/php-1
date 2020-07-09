@@ -225,11 +225,11 @@
           </div>
           <!--COLLAPSE EOC-->
 
-          <?php
+<?php
  
-    $db_id = $_GET['db_id'] ;
+    $db_id = $_GET['db_id'] ;//in adding a row kai it will say throw Undefined index error
 
-    $sql = "SELECT * FROM db WHERE db_ID = $db_id";
+    $sql = "SELECT * FROM db WHERE db_ID = '$db_id'";
     $result = $conn->query($sql);
 
     if($result->num_rows > 0){
@@ -685,41 +685,35 @@
 
 
           function checkPermit($operation,$db_ID,$conn){
-                    $isOkay = TRUE;
+                    $isOkay = FALSE;
 
-                    // if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
-                    //     $isOkay = TRUE;
-                    // }else{
+                     if($_SESSION['Succeed']['type']==="administrator"){
+                         $isOkay = TRUE;
+                     }else{
+                         $userID = $_SESSION['Succeed']['id'];
+                         $sql = "SELECT * FROM users WHERE user_id ='$userID'";                     
+                         $result = $conn->query($sql);
+                         if($result->num_rows>0){
+                           $row = $result->fetch_assoc();
+                           $userID = $row['user_id'];
+                           $sql2 = "SELECT * FROM db where db_ID = $db_ID";
+                           $result2 = $conn->query($sql2);
+                                 if($result2->num_rows>0){
+                                         $row2 = $result2->fetch_assoc();
+                                         $AuthorID = $row2['Author'];
+                                           if($userID === $AuthorID){
+                                                 $isOkay = TRUE;
+                                           }else{
+                                                  $sql3 = "SELECT * FROM permits WHERE operation=$operation AND user_ID = $userID AND db = $db_ID";
+                                                  $result3 = $conn->query($sql3);
+                                                       if($result3->num_rows>0){
+                                                           $isOkay = TRUE;
+                                                        }
+                                           }
 
-                    //     $username = $_SESSION['Succeed'];
-                    //     $sql = "SELECT * FROM users WHERE username ='$username'";
-                       
-                    //     $result = $conn->query($sql);
-                    //     if($result->num_rows>0){
-                    //       $row = $result->fetch_assoc();
-                    //       $userID = $row['user_id'];
-
-                    //       $sql2 = "SELECT * FROM db where db_ID = $db_ID";
-                    //       $result2 = $conn->query($sql2);
-
-                    //             if($result2->num_rows>0){
-                    //                     $row2 = $result2->fetch_assoc();
-                    //                     $AuthorID = $row2['Author'];
-
-                    //                       if($userID === $AuthorID){
-                    //                             $isOkay = TRUE;
-                    //                       }else{
-                    //                              $sql3 = "SELECT * FROM permits WHERE operation=$operation AND user_ID = $userID AND db = $db_ID";
-                    //                              $result3 = $conn->query($sql3);
-                    //                                   if($result3->num_rows>0){
-                    //                                       $isOkay = TRUE;
-                    //                                    }
-                    //                       }
-
-                    //             }
-                    //      }
-                    // }
-
+                                 }
+                          }
+                     }
                 return $isOkay;
 
           }

@@ -47,7 +47,7 @@
 
     # print user type
     function userType() {
-      return $_SESSION['Succeed']['type'] === 'admin' ? 'admin' : 'regular user';
+      return $_SESSION['Succeed']['type'] === 'administrator' ? 'admin' : 'regular user';
     }
 
     displayAlert();
@@ -64,7 +64,7 @@
         </p>
         <hr>
         <p>
-          You issa <?php echo userType(); ?> girl
+          User type: <?php echo userType();?>
         </p>
         <a href="?logout=true" class="btn btn-danger">Logout</a>
         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newDatabase">New Database</button>

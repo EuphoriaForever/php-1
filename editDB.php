@@ -95,20 +95,13 @@
             function checkPermit($operation,$db_ID,$conn){
               $isOkay = FALSE;
 
-              if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
+              if($_SESSION['Succeed']['type']==="administrator"){
                   $isOkay = TRUE;
-              }else{
-<<<<<<< HEAD
-
-                  $username = $_SESSION['Succeed'];
-                  $sql = "SELECT * FROM users WHERE username ='$username'";
-                 
-=======
+              }else{;                 
                 #users can edit databases but also the databases that don't belong to them(a user who owns a db can crud their own db but not others)
                   $userID = $_SESSION['Succeed']['id'];#I'll change this to get the ID instead because ID is absolutely unique, yes username is as well but that's due to conditions, what if someone manages to change the sql file
                   $sql = "SELECT * FROM users WHERE user_id ='$userID'";
                  #BUMP
->>>>>>> 571faa1... my line 102 I changed it from username to id, using the pk
                   $result = $conn->query($sql);
                   if($result->num_rows>0){
                     $row = $result->fetch_assoc();
