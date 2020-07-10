@@ -105,12 +105,12 @@
             function checkPermit($operation,$db_ID,$conn){
               $isOkay = FALSE;
 
-              if($_SESSION['users'][$_SESSION['Succeed']]['type']==="administrator"){
+              if($_SESSION['Succeed']['type']==="administrator"){
                   $isOkay = TRUE;
               }else{
 
-                  $username = $_SESSION['Succeed'];
-                  $sql = "SELECT * FROM users WHERE username ='$username'";
+                  $userID = $_SESSION['Succeed']['id'];
+                  $sql ="SELECT * FROM users WHERE user_id ='$userID'";
                  
                   $result = $conn->query($sql);
                   if($result->num_rows>0){
