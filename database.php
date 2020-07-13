@@ -57,8 +57,7 @@
       <!--Modal-dialog EOC-->
     </div>
     <!--MODAL EOC-->
-    <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample"
-      aria-expanded="false" aria-controls="collapseExample">
+    <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
       Permit List
     </button>
 
@@ -340,10 +339,15 @@
                               if(isset($_GET['delete_row'])){
                                 $row_id = $_GET['delete_row'];
                                 $db_id = $_GET['db_id'];
-  
+                                $isOkay=checkPermit('4',$db_id,$conn);
+
+                                if($isOkay==TRUE){                                  
                                 $sql = "DELETE FROM `rows` WHERE rowNum = $row_id";
-                                if($conn->query($sql)===TRUE){
-                                      echo "<script language='javascript'>alert('A row has been deleted');window.location.href='database.php?db_id=$db_id';</script>";
+                                  if($conn->query($sql)===TRUE){
+                                        echo "<script language='javascript'>alert('A row has been deleted');window.location.href='database.php?db_id=$db_id';</script>";
+                                  }
+                                }else{
+                                  echo "<script language='javascript'>alert('You do not have a permit to delete this row!');window.location.href='database.php?db_id=$db_id';</script>";
                                 }
                               }
                               //delete row from table function
