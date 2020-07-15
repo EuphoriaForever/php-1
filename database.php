@@ -12,6 +12,7 @@
 
   <?php
   // include "./includes/navbar.php";
+    require './requires/checkPermit.php';
     session_start(); #start session in each form validation page so that we can all access the super global var $_SESSION
     include "connectDB.php";
     include "checkLogin.php";
@@ -57,8 +58,7 @@
       <!--Modal-dialog EOC-->
     </div>
     <!--MODAL EOC-->
-    <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample"
-      aria-expanded="false" aria-controls="collapseExample">
+    <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
       Permit List
     </button>
 
@@ -340,10 +340,15 @@
                               if(isset($_GET['delete_row'])){
                                 $row_id = $_GET['delete_row'];
                                 $db_id = $_GET['db_id'];
-  
+                                $isOkay=checkPermit('4',$db_id,$conn);
+
+                                if($isOkay==TRUE){                                  
                                 $sql = "DELETE FROM `rows` WHERE rowNum = $row_id";
-                                if($conn->query($sql)===TRUE){
-                                      echo "<script language='javascript'>alert('A row has been deleted');window.location.href='database.php?db_id=$db_id';</script>";
+                                  if($conn->query($sql)===TRUE){
+                                        echo "<script language='javascript'>alert('A row has been deleted');window.location.href='database.php?db_id=$db_id';</script>";
+                                  }
+                                }else{
+                                  echo "<script language='javascript'>alert('You do not have a permit to delete this row!');window.location.href='database.php?db_id=$db_id';</script>";
                                 }
                               }
                               //delete row from table function
@@ -682,46 +687,7 @@
         echo "<script language='javascript'>alert('Uh oh! You are not authorized to delete from permit list');window.location.href='database.php?db_id=$db_ID';</script>";
       }
     }
-
-
-          function checkPermit($operation,$db_ID,$conn){
-                    $isOkay = FALSE;
-
-                     if($_SESSION['Succeed']['type']==="administrator"){
-                         $isOkay = TRUE;
-                     }else{
-                         $userID = $_SESSION['Succeed']['id'];
-                         $sql = "SELECT * FROM users WHERE user_id ='$userID'";                     
-                         $result = $conn->query($sql);
-                         if($result->num_rows>0){
-                           $row = $result->fetch_assoc();
-                           $userID = $row['user_id'];
-                           $sql2 = "SELECT * FROM db where db_ID = $db_ID";
-                           $result2 = $conn->query($sql2);
-                                 if($result2->num_rows>0){
-                                         $row2 = $result2->fetch_assoc();
-                                         $AuthorID = $row2['Author'];
-                                           if($userID === $AuthorID){
-                                                 $isOkay = TRUE;
-                                           }else{
-                                                  $sql3 = "SELECT * FROM permits WHERE operation=$operation AND user_ID = $userID AND db = $db_ID";
-                                                  $result3 = $conn->query($sql3);
-                                                       if($result3->num_rows>0){
-                                                           $isOkay = TRUE;
-                                                        }
-                                           }
-
-                                 }
-                          }
-                     }
-                return $isOkay;
-
-          }
-
-
-        mysqli_close($conn); 
-
-
+mysqli_close($conn); 
 ?>
 
       <!--HELLO I AM BIG FEAR!!!!! this is where I got stuck!-->

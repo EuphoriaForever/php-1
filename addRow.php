@@ -5,35 +5,29 @@
     <link rel="stylesheet" href="./styles/bootstrap.min.css">
     <title>Table</title>
 </head>
-<body class="bg-secondary">
-     
+<body class="bg-secondary">     
     <?php
   // include "./includes/navbar.php";
-
+    require './requires/checkPermit.php';
     session_start(); #start session in each form validation page so that we can all access the super global var $_SESSION
-
     
     if(!isset($_SESSION['Succeed'])) { #if there is no current login session detected, go to login page
       header("Location: login.php");
     }else{
-
     //   if($_SESSION['users'][$_SESSION['Succeed']]['type'] ==="administrator"){
     //     include "./includes/navbarAdmin.php";
     //   }else {
     //     include "./includes/navbarUser.php";
     //   }
         include "./includes/navbarMain.php";
-
     }
 
     if(isset($_GET['logout'])) { #if u wanna logout, remove current login session and redirect to login page
       unset($_SESSION['Succeed']);
       header("Location: login.php");
-    }
-
-    
+    }    
   ?>
-          <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
+  <div class="container w-50 position-relative mx-auto p-5 my-5 bg-light shadow">
 <?php
     $server = "localhost";
     $username = "root";
@@ -158,7 +152,6 @@
     } else {
             // table does not exist
     }
-
     
     if(isset($_POST['submit'])){
         $tb_ID = $_POST['tb_ID'];
@@ -217,49 +210,12 @@
                 echo "sad life";
             }
         }else{
-            // echo "<script language='javascript'>alert('Uh oh! You do not have a permit to tinker on this TB');window.location.href='database.php?db_id=$db_ID';</script>";
+                echo "<script language='javascript'>alert('You do not have a permit to edit this row!');window.location.href='database.php?db_id=$db_ID';</script>";
         }
     }
-
-    function checkPermit($operation,$db_ID,$conn){
-        $isOkay = FALSE;
-        if($_SESSION['Succeed']['type'] === 'administrator'){
-            $isOkay = TRUE;
-        }else{
-            $username = $_SESSION['Succeed']['username'];
-            $sql = "SELECT * FROM users WHERE username ='$username'";
-            $result = $conn->query($sql);
-            if($result->num_rows>0){
-                $row = $result->fetch_assoc();
-                $userID = $row['user_id'];
-                $sql2 = "SELECT * FROM db where db_ID = $db_ID";
-                $result2 = $conn->query($sql2);
-                if($result2->num_rows>0){
-                    $row2 = $result2->fetch_assoc();
-                    $AuthorID = $row2['Author'];
-                    if($userID == $AuthorID){
-                        $isOkay = TRUE;
-                    }else{
-                        $sql3 = "SELECT * FROM permits WHERE operation=$operation AND user_ID = $userID AND db = $db_ID";
-                        $result3 = $conn->query($sql3);
-                        if($result3->num_rows>0){
-                            $isOkay = TRUE;
-                        }
-                    }
-                }
-            }
-        }
-        return $isOkay;
-    }
-
 ?>
     </div>
 <!--HELLO I AM BIG FEAR!!!!! this is where I got stuck!-->
-
-
-
-
-
    <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
