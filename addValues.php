@@ -96,7 +96,7 @@
 
         #ALL THIS FOR THE SAKE OF A REUSABLE ROW_NUM BEC I'M EXTRA LIKE THAT DA DA DA i hate my brain
 
-              $sql = "SELECT attr_ID FROM attributes WHERE tb_ID = $tb_ID AND isPrimary = 1";
+              $sql = "SELECT attr_ID FROM attributes WHERE tb_ID = $tb_id AND isPrimary = 1";
               $check = $conn->query($sql); 
               if($check!=null && $check->num_rows>0){
                 $row = $check->fetch_assoc();
@@ -106,17 +106,17 @@
                     $check2 = $conn->query($sql2);
                     if($check2!=null && $check->num_rows>0){
                         $row2 = $check2->fetch_assoc();
-                        $rowNum = $row2['rowNum'];
+                        $rowNum = $row2['value'];
                     }
               }
 
-              $rowNum++;
+              $row = (int)$rowNum + 1;
 
             foreach($input as $name => $info){
                 $value = $_POST[$name] ;
                 $attrID = $_POST[$info['id']];
 
-                $insert = "INSERT INTO rows(rowNum,attr_ID,value) VALUES($rowNum,$attrID,$value)";
+                $insert = "INSERT INTO rows(rowNum,attr_ID,value) VALUES($row,$attrID,$value)";
                 $conn->query($insert);
             }
         
