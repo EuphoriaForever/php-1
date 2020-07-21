@@ -69,11 +69,28 @@
               }
             }
 
-            # display alerts at the top
-            displayAlert();
+            if(count($inputs) === 1 && isset($inputs['ID'])) {
+              header("Location: ".$_SERVER['HTTP_REFERER']);
+            } else {
+              # display alerts at the top
+              displayAlert();
+            } 
+
           }
         }
 
+      }
+    } else if(isset($_POST['insertValue'])) {
+      $db_id = $_POST['db_id'];
+      $tb_id = $_POST['tb_id'];
+      $permissions = permissions($db_id);
+
+      if(!isAllowed(1)) {
+        addAlert("<b>Oops!</b> You do not have the correct permissions to do that.", "danger");
+        header("Location: ".$_SERVER['HTTP_REFERER']);
+      } else {
+        $headers = 'row';
+        
       }
     } else {
       header("location:javascript://history.go(-1)");
@@ -135,6 +152,12 @@
               }?>
             </div>
         <?php } } ?>
+        <input type="hidden" name="tb_id" value="<?php echo $tb_id; ?>">
+        <input type="hidden" name="db_id" value="<?php echo $db_id; ?>">
+        <div class="row w-100 justify-content-end mx-3">
+          <button type="button" class="btn btn-secondary mr-2">Cancel</button>
+          <button type="submit" class="btn btn-success" name="insertValue">Insert</button>
+        </div>
       </form>
     </div>
   </div>
