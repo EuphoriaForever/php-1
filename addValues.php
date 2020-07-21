@@ -102,15 +102,21 @@
                 $row = $check->fetch_assoc();
                 $attr_ID = $row['attr_ID'];
 
-                    $sql2 = "SELECT value FROM rows WHERE attr_ID = $attr_ID ORDER BY row_ID DESC LIMIT 1";
+                    $sql2 = "SELECT value FROM rows WHERE attr_ID = '$attr_ID' ORDER BY row_ID DESC LIMIT 1";
                     $check2 = $conn->query($sql2);
                     if($check2!=null && $check2->num_rows>0){
                         $row2 = $check2->fetch_assoc();
                         $rowNumero = $row2['value'];
+                        $rowInt = (int)$rowNumero + 1;
                     }
               }
               #undefined daw ang rowNumero and therefore hasta ang ubos di mugana :((( ...
-              $rowInt = (int) $rowNumero + 1;
+              //SELECT contact_id, last_name, first_name
+// FROM contacts
+// WHERE website = 'TechOnTheNet.com'
+// ORDER BY contact_id DESC
+// LIMIT 5;
+              // $rowInt = (int)$rowNumero + 1;
 
             foreach($inputs as $name => $info){
                 $value = $_POST[$name] ;
