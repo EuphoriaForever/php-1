@@ -135,6 +135,7 @@
               }?>
             </div>
         <?php } } ?>
+        <input type="submit" class="btn btn-success text-white" value="Submit" name="submit" required>
       </form>
     </div>
   </div>
