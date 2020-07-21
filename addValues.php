@@ -110,13 +110,7 @@
                         $rowInt = (int)$rowNumero + 1;
                     }
               }
-              #undefined daw ang rowNumero and therefore hasta ang ubos di mugana :((( ...
-              //SELECT contact_id, last_name, first_name
-// FROM contacts
-// WHERE website = 'TechOnTheNet.com'
-// ORDER BY contact_id DESC
-// LIMIT 5;
-              // $rowInt = (int)$rowNumero + 1;
+  
 
             foreach($inputs as $name => $info){
                 $value = $_POST[$name] ;
