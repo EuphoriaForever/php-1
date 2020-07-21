@@ -152,16 +152,12 @@
               }?>
             </div>
         <?php } } ?>
-<<<<<<< HEAD
-        <input type="submit" class="btn btn-success text-white" value="Submit" name="submit" required>
-=======
         <input type="hidden" name="tb_id" value="<?php echo $tb_id; ?>">
         <input type="hidden" name="db_id" value="<?php echo $db_id; ?>">
         <div class="row w-100 justify-content-end mx-3">
           <button type="button" class="btn btn-secondary mr-2">Cancel</button>
           <button type="submit" class="btn btn-success" name="insertValue">Insert</button>
         </div>
->>>>>>> b7dad4c5e0cac69edb3839db22ae6644febf3f05
       </form>
     </div>
   </div>
