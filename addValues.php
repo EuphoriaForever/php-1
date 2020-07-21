@@ -104,21 +104,23 @@
 
                     $sql2 = "SELECT value FROM rows WHERE attr_ID = $attr_ID ORDER BY row_ID DESC LIMIT 1";
                     $check2 = $conn->query($sql2);
-                    if($check2!=null && $check->num_rows>0){
+                    if($check2!=null && $check2->num_rows>0){
                         $row2 = $check2->fetch_assoc();
-                        $rowNum = $row2['value'];
+                        $rowNumero = $row2['value'];
                     }
               }
+              #undefined daw ang rowNumero and therefore hasta ang ubos di mugana :((( ...
+              $rowInt = (int) $rowNumero + 1;
 
-              $row = (int)$rowNum + 1;
-
-            foreach($input as $name => $info){
+            foreach($inputs as $name => $info){
                 $value = $_POST[$name] ;
                 $attrID = $_POST[$info['id']];
 
-                $insert = "INSERT INTO rows(rowNum,attr_ID,value) VALUES($row,$attrID,$value)";
+                $insert = "INSERT INTO rows(rowNum,attr_ID,value) VALUES($rowInt,$attrID,$value)";
                 $conn->query($insert);
             }
+            
+            // echo "<script language='javascript'>alert('Table Successfully Added!');window.location.href='database-new.php?db_id=$db_id';</script>";
         
       }
     } else {
