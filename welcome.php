@@ -14,6 +14,7 @@
     # start session, connect db, check login
     session_start();
     include "connectDB.php";
+    include "checkLogin.php";
 
     # add inserting in this section so the navbar can adopt the new database name
     if(isset($_POST['createDB'])) {
