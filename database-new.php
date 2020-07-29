@@ -296,6 +296,8 @@
                       <?php foreach($tb['headers'] as $head) { ?>
                         <th scope="col"><?php echo $head['name']; ?></th>
                       <?php } ?>
+                      <th scope="col">Edit</th>
+                      <th scope="col">Delete</th>
                     </thead>
                     <?php if(!empty($tb['rows'])) { ?>
                       <tbody>
@@ -310,6 +312,8 @@
                                 ?>
                               </td>
                             <?php } ?>
+                            <td><a class="btn btn-dark" href="database-new.php?">Edit Row</a></td>
+                            <td><a class="btn btn-danger" href="database-new.php?">Delete Row</a></td>
                           </tr>
                         <?php } ?>
                       </tbody>
