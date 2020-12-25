@@ -205,12 +205,12 @@
                 }
             }
             if($ctr==count($attributeArray)){
-                echo "<script language='javascript'>alert('Information Successfully Edited!');window.location.href='database.php?db_id=$db_ID';</script>";
+                echo "<script language='javascript'>alert('Information Successfully Added!');window.location.href='database.php?db_id=$db_ID';</script>";
             } else {
                 echo "sad life";
             }
         }else{
-                echo "<script language='javascript'>alert('You do not have a permit to edit this row!');window.location.href='database.php?db_id=$db_ID';</script>";
+                echo "<script language='javascript'>alert('You do not have a permit to add onto this table!');window.location.href='database.php?db_id=$db_ID';</script>";
         }
     }
 ?>

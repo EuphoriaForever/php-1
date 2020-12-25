@@ -23,7 +23,7 @@
                     while($row = $result->fetch_assoc()){
                       echo '
                       <li class="nav-item">
-                          <a class="nav-link" href="database.php?db_id='.$row['db_ID'].'">'.$row['db_Name'].'<span class="sr-only"></span></a>
+                          <a class="nav-link" href="database-new.php?db_id='.$row['db_ID'].'">'.$row['db_Name'].'<span class="sr-only"></span></a>
                       </li>
                       ';
                     }

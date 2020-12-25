@@ -90,6 +90,37 @@
         header("Location: ".$_SERVER['HTTP_REFERER']);
       } else {
         $headers = 'row';
+        #my thought process is somewhere along the lines of like "HOW TF do i Know the current rowNumber that the new values should have?"
+        #so maybe kuhaon sa nako ang attr_ID from attributes whose tb_id = $tb_ID AND isPrimary = 1
+        #then after that kay SELECT value FROM rows WHERE attr_ID = $attr_ID ORDER BY row_ID DESC LIMIT 1 so that mareturn ang value sa kung ikapila ang last row number
+
+        #ALL THIS FOR THE SAKE OF A REUSABLE ROW_NUM BEC I'M EXTRA LIKE THAT DA DA DA i hate my brain
+
+              $sql = "SELECT attr_ID FROM attributes WHERE tb_ID = $tb_id AND isPrimary = 1";
+              $check = $conn->query($sql); 
+              if($check!=null && $check->num_rows>0){
+                $row = $check->fetch_assoc();
+                $attr_ID = $row['attr_ID'];
+
+                    $sql2 = "SELECT value FROM rows WHERE attr_ID = '$attr_ID' ORDER BY row_ID DESC LIMIT 1";
+                    $check2 = $conn->query($sql2);
+                    if($check2!=null && $check2->num_rows>0){
+                        $row2 = $check2->fetch_assoc();
+                        $rowNumero = $row2['value'];
+                        $rowInt = (int)$rowNumero + 1;
+                    }
+              }
+  
+
+            foreach($inputs as $name => $info){
+                $value = $_POST[$name] ;
+                $attrID = $_POST[$info['id']];
+
+                $insert = "INSERT INTO rows(rowNum,attr_ID,value) VALUES($rowInt,$attrID,$value)";
+                $conn->query($insert);
+            }
+            
+            // echo "<script language='javascript'>alert('Table Successfully Added!');window.location.href='database-new.php?db_id=$db_id';</script>";
         
       }
     } else {
@@ -101,7 +132,7 @@
     <div class="container-fluid p-2 bg-light">
       <h3 class="text-center">Table: <?php echo $tbName; ?></h3>
       <hr>
-      <form action="addRow-new.php" class="row" method="post">
+      <form action="addValues.php" class="row" method="post">
         <?php foreach($inputs as $name => $info) { ?>
           <?php if(!$info['primary']) { ?>
             <div class="form-group col-6">
